@@ -59,6 +59,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 /* DASHBOARD */
 .dash-top { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:12px; }
 .dash-kpi { background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.07); border-top:3px solid var(--gray-200); }
+.dash-kpi.clickable { cursor:pointer; transition:transform .15s,box-shadow .15s; }
+.dash-kpi.clickable:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
+.dash-kpi.clickable.active-kpi { outline:2px solid var(--brand); outline-offset:2px; }
 .dash-kpi.green  { border-top-color:var(--brand); }
 .dash-kpi.blue   { border-top-color:var(--blue); }
 .dash-kpi.orange { border-top-color:var(--orange); }
@@ -240,72 +243,90 @@ Team NOSH7 🌱
     </div>
   </div>
 
-  <!-- DASHBOARD KPIs -->
-  <div id="dashKpis" class="dash-top"></div>
-
-  <!-- BATCH TABLE -->
-  <div class="dash-section">
-    <div class="dash-section-hdr" onclick="toggleBatch()">
-      📦 Active Customers by Batch / Route
-      <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="dash-section" style="margin-bottom:14px">
+    <div class="dash-section-hdr" style="cursor:default;justify-content:flex-start;gap:10px">
+      📊 Dashboard
+      <span style="font-weight:400;font-size:11px;color:var(--gray-400)">Click any number to filter members below</span>
     </div>
-    <div id="batchBody" style="display:none">
-      <table class="batch-table">
-        <thead><tr><th>Route / Batch</th><th>Active</th><th>Pending Deliveries</th><th>Avg Left</th><th>Share</th></tr></thead>
-        <tbody id="batchRows"></tbody>
-      </table>
+
+    <!-- KPI GRID -->
+    <div id="dashKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--gray-100)"></div>
+
+    <!-- BATCH TABLE -->
+    <div style="border-top:1px solid var(--gray-200)">
+      <div class="dash-section-hdr" onclick="toggleBatch()" style="border-top:none">
+        📦 Active by Batch / Route
+        <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
+      </div>
+      <div id="batchBody" style="display:none">
+        <table class="batch-table">
+          <thead><tr><th>Route / Batch</th><th>Active</th><th>Pending Deliveries</th><th>Avg Left</th><th>Share</th></tr></thead>
+          <tbody id="batchRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DELIVERY FILTER (hidden by default) -->
+    <div style="border-top:1px solid var(--gray-200);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="toggleQuotaFilter()" id="quotaToggleBtn"
+        style="border-color:var(--brand);color:var(--brand);font-size:12px">▼ Show Delivery Count Filter</button>
+      <span id="qbHint" style="font-size:12px;color:var(--gray-500);font-weight:500"></span>
+    </div>
+    <div id="quotaBanner" style="display:none;padding:12px 14px;background:linear-gradient(135deg,#15803d,#16a34a);border-radius:0 0 12px 12px">
+      <div style="color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px">Click a count to show matching members</div>
+      <div class="quota-chips" id="quotaChips"></div>
     </div>
   </div>
 
-  <!-- QUICK FILTER ROW -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
-    <button class="btn btn-outline btn-sm" id="zeroDelivBtn" onclick="setFilter(0)" style="font-weight:700;border-color:#fca5a5;color:#991b1b;background:#fff1f2">
-      🔴 0 Deliveries Left — <span id="zeroDelivCount">0</span>
-    </button>
-    <button class="btn btn-outline btn-sm" onclick="toggleQuotaFilter()" id="quotaToggleBtn"
-      style="border-color:var(--brand);color:var(--brand)">
-      ▼ Show Delivery Filter
-    </button>
-    <span id="qbHint" style="font-size:12px;color:var(--gray-500);font-weight:500"></span>
-  </div>
-
-  <!-- QUOTA FILTER (hidden by default) -->
-  <div class="quota-banner" id="quotaBanner" style="display:none;margin-bottom:14px">
-    <div class="qb-label">
-      <strong>Filter by Remaining Deliveries</strong>
-      <span>Click a count to show those members</span>
+  <!-- ═══ QUICK FILTER BAR (always visible) ═══ -->
+  <div class="toolbar" style="position:sticky;top:54px;z-index:90;border-radius:0;margin:0 -20px 14px;padding:10px 20px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+    <div class="tg">
+      <label>🔴 0 Left</label>
+      <button id="zeroDelivBtn" onclick="setFilter(0)"
+        style="font-weight:700;border:1.5px solid #fca5a5;color:#991b1b;background:#fff1f2;border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer;white-space:nowrap">
+        <span id="zeroDelivCount">0</span> members
+      </button>
     </div>
-    <div class="quota-chips" id="quotaChips"></div>
-  </div>
-
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <div class="tg"><label>Status</label>
-      <select id="fStatus" onchange="renderCards()">
+    <div class="tg">
+      <label>Status</label>
+      <select id="fStatus" onchange="resetDashKpi();renderCards()">
         <option value="">All</option>
         <option>Pending</option><option>Contacted</option><option>Interested</option>
         <option>Follow-Up</option><option>Converted</option><option>Not Interested</option>
       </select>
     </div>
-    <div class="tg"><label>Plan</label><select id="fPlan" onchange="renderCards()"><option value="">All Plans</option></select></div>
-    <div class="tg"><label>Area</label><select id="fArea" onchange="renderCards()"><option value="">All Areas</option></select></div>
-    <div class="tg"><label>Follow-Up</label>
-      <select id="fFollowup" onchange="renderCards()">
-        <option value="">All</option>
+    <div class="tg">
+      <label>Last Delivery From</label>
+      <input type="date" id="fLdFrom" onchange="renderCards()">
+    </div>
+    <div class="tg">
+      <label>To</label>
+      <input type="date" id="fLdTo" onchange="renderCards()">
+    </div>
+    <div class="tg" id="ldClear" style="display:none">
+      <button class="btn btn-outline btn-sm" onclick="clearDates()">✕ Dates</button>
+    </div>
+    <div class="tg">
+      <label>Search</label>
+      <input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:130px">
+    </div>
+    <div class="tg" style="margin-left:auto;gap:6px">
+      <select id="fPlan" onchange="renderCards()" title="Filter by Plan"><option value="">All Plans</option></select>
+      <select id="fArea" onchange="renderCards()" title="Filter by Area"><option value="">All Areas</option></select>
+      <select id="fFollowup" onchange="renderCards()" title="Follow-Up filter">
+        <option value="">Follow-Up: All</option>
         <option value="overdue">⚠ Overdue</option>
         <option value="today">🔔 Today</option>
         <option value="upcoming">📅 Upcoming</option>
       </select>
+      <button class="btn btn-outline btn-sm" onclick="resetAllFilters()">✕ Reset</button>
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export</button>
     </div>
-    <div class="tg"><label>Last Delivery From</label><input type="date" id="fLdFrom" onchange="renderCards()"></div>
-    <div class="tg"><label>To</label><input type="date" id="fLdTo" onchange="renderCards()"></div>
-    <div class="tg" id="ldClear" style="display:none"><button class="btn btn-outline btn-sm" onclick="clearDates()">✕ Dates</button></div>
-    <div class="tg"><label>Search</label><input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:140px"></div>
-    <div style="margin-left:auto"><button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export</button></div>
   </div>
 
-  <!-- STATS BAR -->
-  <div class="stats-bar" id="statsBar"></div>
+  <!-- SHOWING COUNT -->
+  <div id="showingBar" style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px;padding:0 2px"></div>
 
   <!-- CARDS -->
   <div class="cards-grid" id="cardsGrid"></div>
@@ -371,6 +392,7 @@ let pendingContact = null;
 let tplOpen        = false;
 let batchOpen      = false;
 let activeFilter   = 'all';
+let activeDashKpi  = null;  // which dashboard KPI tile is highlighted
 let _pushing       = false; // prevent re-entrant pushes
 
 // ═══════════════════════════════════════════
@@ -627,13 +649,14 @@ function renderDashboard() {
   const sc={};
   members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
 
+  const zeroCount=list.filter(m=>(parseFloat(m.remaining)||0)===0).length;
   document.getElementById('dashKpis').innerHTML=`
-    <div class="dash-kpi green"><div class="kpi-num">${active.length}</div><div class="kpi-label">🟢 Active Customers</div></div>
-    <div class="dash-kpi blue"><div class="kpi-num">${totalPending}</div><div class="kpi-label">📦 Total Pending Deliveries</div></div>
-    <div class="dash-kpi orange"><div class="kpi-num">${sc['Follow-Up']||0}</div><div class="kpi-label">🔔 Follow-Up Pending</div></div>
-    <div class="dash-kpi purple"><div class="kpi-num">${sc['Converted']||0}</div><div class="kpi-label">✅ Renewed</div></div>
-    <div class="dash-kpi red"><div class="kpi-num">${list.filter(m=>(parseFloat(m.remaining)||0)===0).length}</div><div class="kpi-label">🔴 Zero Remaining</div></div>
-    <div class="dash-kpi"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
+    <div class="dash-kpi green clickable${activeDashKpi==='active'?' active-kpi':''}" onclick="dashFilterBy('quota','active')"><div class="kpi-num">${active.length}</div><div class="kpi-label">🟢 Active Customers</div></div>
+    <div class="dash-kpi blue"><div class="kpi-num">${totalPending}</div><div class="kpi-label">📦 Pending Deliveries</div></div>
+    <div class="dash-kpi orange clickable${activeDashKpi==='followup'?' active-kpi':''}" onclick="dashFilterBy('status','Follow-Up')"><div class="kpi-num">${sc['Follow-Up']||0}</div><div class="kpi-label">🔔 Follow-Up</div></div>
+    <div class="dash-kpi purple clickable${activeDashKpi==='converted'?' active-kpi':''}" onclick="dashFilterBy('status','Converted')"><div class="kpi-num">${sc['Converted']||0}</div><div class="kpi-label">✅ Renewed</div></div>
+    <div class="dash-kpi red clickable${activeDashKpi==='zero'?' active-kpi':''}" onclick="dashFilterBy('quota','zero')"><div class="kpi-num">${zeroCount}</div><div class="kpi-label">🔴 Zero Remaining</div></div>
+    <div class="dash-kpi clickable${activeDashKpi==='all'?' active-kpi':''}" onclick="dashFilterBy('all','all')"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
   `;
 
   const byRoute={};
@@ -657,6 +680,44 @@ function renderDashboard() {
     :`<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:18px">No active customers</td></tr>`;
 }
 function toggleBatch(){batchOpen=!batchOpen;document.getElementById('batchBody').style.display=batchOpen?'':'none';document.getElementById('batchToggle').textContent=batchOpen?'▲ collapse':'▼ expand';}
+
+// ═══════════════════════════════════════════
+// DASHBOARD KPI CLICK FILTERING
+// ═══════════════════════════════════════════
+function dashFilterBy(type, kpiId) {
+  activeDashKpi = kpiId;
+  if(type === 'quota') {
+    activeFilter = kpiId === 'active' ? 'active' : kpiId === 'zero' ? 0 : 'all';
+    document.getElementById('fStatus').value = '';
+  } else if(type === 'status') {
+    activeFilter = 'all';
+    document.getElementById('fStatus').value = kpiId;
+  } else {
+    activeFilter = 'all';
+    document.getElementById('fStatus').value = '';
+  }
+  buildQuotaChips();
+  renderDashboard();
+  renderCards();
+}
+function resetDashKpi() {
+  activeDashKpi = null;
+  renderDashboard();
+}
+function resetAllFilters() {
+  activeFilter = 'all';
+  activeDashKpi = null;
+  document.getElementById('fStatus').value = '';
+  document.getElementById('fPlan').value = '';
+  document.getElementById('fArea').value = '';
+  document.getElementById('fFollowup').value = '';
+  document.getElementById('fSearch').value = '';
+  document.getElementById('fLdFrom').value = '';
+  document.getElementById('fLdTo').value = '';
+  buildQuotaChips();
+  renderDashboard();
+  renderCards();
+}
 
 // ═══════════════════════════════════════════
 // RENDER
@@ -699,17 +760,9 @@ function renderCards() {
   if(search) list=list.filter(m=>m.name.toLowerCase().includes(search)||m.phone.includes(search));
   list.sort((a,b)=>sortScore(a,today)-sortScore(b,today)||a.name.localeCompare(b.name));
 
-  const sc={};
-  members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
-  const totPending=members.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
-  document.getElementById('statsBar').innerHTML=`
-    <div class="sc blue"><span class="n">${list.length}</span>Showing</div>
-    <div class="sc"><span class="n">${sc['Pending']||0}</span>Pending</div>
-    <div class="sc orange"><span class="n">${sc['Follow-Up']||0}</span>Follow-Up</div>
-    <div class="sc green"><span class="n">${sc['Converted']||0}</span>Renewed</div>
-    <div class="sc red"><span class="n">${sc['Not Interested']||0}</span>Not Int.</div>
-    <div class="sc purple"><span class="n">${totPending}</span>Total Pending Deliveries</div>
-  `;
+  const total=smartFilter(members).length;
+  const sb=document.getElementById('showingBar');
+  if(sb) sb.textContent=list.length===total?`Showing all ${list.length} members`:`Showing ${list.length} of ${total} members`;
 
   if(activeFilter==='all')         document.getElementById('qbHint').textContent='';
   else if(activeFilter==='active') document.getElementById('qbHint').textContent=`${list.length} active members with deliveries remaining`;
