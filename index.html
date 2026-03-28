@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NOSH7 — Member Outreach Manager</title>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing:border-box; margin:0; padding:0; }
 :root {
   --green:#25D366; --green-dark:#128C7E;
   --blue:#2563eb;  --blue-dark:#1d4ed8;
@@ -18,21 +20,31 @@
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--gray-100); color:var(--gray-900); min-height:100vh; }
 
 /* HEADER */
-.header { background:var(--brand); color:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.15); gap:8px; }
+.header { background:var(--brand); color:#fff; padding:11px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.15); gap:8px; }
 .header-logo h1 { font-size:17px; font-weight:800; }
 .header-logo .sub { font-size:11px; opacity:.8; margin-top:1px; }
 .header-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
-.save-badge { font-size:11px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:3px 9px; white-space:nowrap; }
+
+/* SYNC INDICATOR */
+.sync-dot {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:600;
+  background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+  border-radius:20px; padding:3px 10px; white-space:nowrap;
+}
+.sync-dot .dot { width:7px; height:7px; border-radius:50%; background:#86efac; flex-shrink:0; }
+.sync-dot.syncing .dot { background:#fcd34d; animation:pulse .8s ease infinite; }
+.sync-dot.offline .dot { background:#fca5a5; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 /* BUTTONS */
 .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 13px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; text-decoration:none; white-space:nowrap; }
 .btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { background:var(--blue-dark); }
 .btn-wa   { background:var(--green); color:#fff; font-size:12px; padding:7px 10px; } .btn-wa:hover   { background:var(--green-dark); }
-.btn-call { background:var(--blue); color:#fff; font-size:12px; padding:7px 10px; }  .btn-call:hover { background:var(--blue-dark); }
+.btn-call { background:var(--blue);  color:#fff; font-size:12px; padding:7px 10px; } .btn-call:hover { background:var(--blue-dark); }
 .btn-outline { background:#fff; color:var(--gray-700); border:1px solid var(--gray-300); } .btn-outline:hover { background:var(--gray-50); }
 .btn-sm { padding:5px 10px; font-size:12px; border-radius:6px; }
 .btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-size:12px; padding:6px 11px; } .btn-ghost:hover { background:rgba(255,255,255,.15); }
-.btn-green { background:var(--brand); color:#fff; } .btn-green:hover { background:var(--brand-dark); }
 
 /* UPLOAD ZONE */
 .upload-zone { border:2px dashed var(--gray-300); border-radius:14px; padding:48px 20px; text-align:center; background:#fff; cursor:pointer; transition:all .2s; margin:20px; }
@@ -68,17 +80,16 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .batch-table tr:last-child td { border-bottom:none; }
 .batch-table tr:hover td { background:var(--gray-50); }
 .td-name { font-weight:600; }
-.td-num  { font-weight:700; color:var(--gray-900); }
+.td-num  { font-weight:700; }
 .bar-wrap { width:100px; height:6px; background:var(--gray-100); border-radius:3px; overflow:hidden; }
 .bar-fill { height:100%; border-radius:3px; background:var(--brand); }
 
-/* QUOTA FILTER BANNER */
+/* QUOTA FILTER */
 .quota-banner { background:linear-gradient(135deg,#15803d,#16a34a); border-radius:12px; padding:14px 16px; margin-bottom:14px; }
-.quota-banner-top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
 .qb-label strong { color:#fff; display:block; font-size:14px; }
 .qb-label span   { color:rgba(255,255,255,.8); font-size:11px; }
-.qb-hint { color:rgba(255,255,255,.8); font-size:12px; }
-.quota-chips { display:flex; gap:7px; flex-wrap:wrap; }
+.qb-hint { color:rgba(255,255,255,.75); font-size:12px; margin-top:6px; }
+.quota-chips { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
 .qchip { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:20px; padding:5px 12px; color:#fff; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; }
 .qchip:hover { background:rgba(255,255,255,.28); }
 .qchip.active { background:rgba(255,255,255,.5); border-color:#fff; color:#166534; }
@@ -146,11 +157,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .hints { font-size:11px; color:var(--gray-400); margin-top:6px; line-height:1.8; }
 .hints code { background:var(--gray-100); padding:1px 5px; border-radius:4px; }
 
-/* OVERLAY / MODAL */
+/* MODALS */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,.52); z-index:200; display:flex; align-items:center; justify-content:center; padding:14px; }
 .overlay.hidden { display:none; }
 .modal { background:#fff; border-radius:16px; padding:22px; width:100%; max-width:460px; box-shadow:0 24px 64px rgba(0,0,0,.22); animation:slideUp .18s ease; }
-@keyframes slideUp { from { transform:translateY(16px); opacity:0; } to { transform:none; opacity:1; } }
+@keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:none;opacity:1} }
 .modal h2 { font-size:17px; font-weight:800; }
 .modal .msub { font-size:13px; color:var(--gray-500); margin:4px 0 18px; }
 .fg { margin-bottom:13px; }
@@ -160,32 +171,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .fg select:focus,.fg input:focus,.fg textarea:focus { outline:none; border-color:var(--brand); background:#fff; }
 .modal-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:18px; }
 
-/* SYNC MODAL TABS */
-.sync-tabs { display:flex; gap:0; border-bottom:2px solid var(--gray-200); margin-bottom:16px; }
-.sync-tab { padding:8px 18px; font-size:13px; font-weight:600; color:var(--gray-500); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; }
-.sync-tab.active { color:var(--brand); border-bottom-color:var(--brand); }
-.sync-panel { display:none; }
-.sync-panel.active { display:block; }
-.backup-area { width:100%; border:1px solid var(--gray-300); border-radius:8px; padding:10px; font-size:11px; font-family:monospace; min-height:80px; resize:none; background:var(--gray-50); color:var(--gray-700); }
-.sync-note { font-size:12px; color:var(--gray-500); margin-top:8px; line-height:1.6; }
-
-/* EMPTY */
+/* EMPTY / TOAST */
 .empty-state { text-align:center; padding:60px 20px; color:var(--gray-400); grid-column:1/-1; }
 .empty-state h3 { font-size:17px; font-weight:700; color:var(--gray-500); margin-bottom:8px; }
-
-/* TOAST */
 .toast { position:fixed; bottom:18px; right:18px; z-index:500; padding:11px 18px; border-radius:10px; font-size:13px; font-weight:600; background:var(--gray-900); color:#fff; box-shadow:0 6px 24px rgba(0,0,0,.2); animation:slideUp .18s ease; max-width:300px; }
 .toast.hidden { display:none; }
 .toast.ok  { background:#166534; }
 .toast.err { background:#991b1b; }
 
 @media (max-width:600px) {
-  .main { padding:12px; }
-  .header { padding:10px 14px; }
-  .upload-zone { margin:12px; }
-  .cards-grid { grid-template-columns:1fr; }
-  .dash-top { grid-template-columns:repeat(2,1fr); }
-  .header-logo h1 { font-size:15px; }
+  .main{padding:12px;} .header{padding:10px 14px;}
+  .upload-zone{margin:12px;} .cards-grid{grid-template-columns:1fr;}
+  .dash-top{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
@@ -195,11 +192,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 <div class="header">
   <div class="header-logo">
     <h1>🥗 NOSH7 Outreach</h1>
-    <div class="sub" id="headerSub">Upload today's report to begin</div>
+    <div class="sub" id="headerSub">Connecting…</div>
   </div>
   <div class="header-right">
-    <span class="save-badge" id="saveBadge" style="display:none"></span>
-    <button class="btn btn-ghost" onclick="openSyncModal()">📱 Sync</button>
+    <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
     <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">⬆ Upload</button>
     <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
     <button class="btn btn-ghost" onclick="confirmClear()" title="Clear data">🗑</button>
@@ -216,15 +212,14 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   <h3>Upload NOSH7 Subscription Report</h3>
   <p>Drop the daily CSV here or click to browse</p>
   <p style="margin-top:10px;font-size:12px;color:#94a3b8">
-    Phone = unique ID · New members added · Existing statuses preserved<br>
-    <strong style="color:#64748b">To use on mobile: Upload CSV here first, then tap 📱 Sync to transfer data</strong>
+    Data syncs automatically across all your devices in real time 🔄
   </p>
 </div>
 
 <!-- MAIN -->
 <div class="main" id="mainContent" style="display:none">
 
-  <!-- TEMPLATE PANEL -->
+  <!-- TEMPLATE -->
   <div class="panel">
     <div class="panel-hdr" onclick="togglePanel()">
       <h3>💬 WhatsApp Template &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
@@ -245,10 +240,11 @@ Team NOSH7 🌱
     </div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="dashKpis" class="dash-top" style="margin-bottom:12px"></div>
+  <!-- DASHBOARD KPIs -->
+  <div id="dashKpis" class="dash-top"></div>
 
-  <div class="dash-section" id="batchSection">
+  <!-- BATCH TABLE -->
+  <div class="dash-section">
     <div class="dash-section-hdr" onclick="toggleBatch()">
       📦 Active Customers by Batch / Route
       <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
@@ -263,39 +259,26 @@ Team NOSH7 🌱
 
   <!-- QUOTA FILTER -->
   <div class="quota-banner">
-    <div class="quota-banner-top">
-      <div class="qb-label">
-        <strong>Filter by Remaining Deliveries</strong>
-        <span>Click a count to show those members · <span id="qbHint"></span></span>
-      </div>
+    <div class="qb-label">
+      <strong>Filter by Remaining Deliveries</strong>
+      <span>Click a count to show those members</span>
     </div>
     <div class="quota-chips" id="quotaChips"></div>
+    <div class="qb-hint" id="qbHint"></div>
   </div>
 
   <!-- TOOLBAR -->
   <div class="toolbar">
-    <div class="tg">
-      <label>Status</label>
+    <div class="tg"><label>Status</label>
       <select id="fStatus" onchange="renderCards()">
         <option value="">All</option>
         <option>Pending</option><option>Contacted</option><option>Interested</option>
         <option>Follow-Up</option><option>Converted</option><option>Not Interested</option>
       </select>
     </div>
-    <div class="tg">
-      <label>Plan</label>
-      <select id="fPlan" onchange="renderCards()">
-        <option value="">All Plans</option>
-      </select>
-    </div>
-    <div class="tg">
-      <label>Area</label>
-      <select id="fArea" onchange="renderCards()">
-        <option value="">All Areas</option>
-      </select>
-    </div>
-    <div class="tg">
-      <label>Follow-Up</label>
+    <div class="tg"><label>Plan</label><select id="fPlan" onchange="renderCards()"><option value="">All Plans</option></select></div>
+    <div class="tg"><label>Area</label><select id="fArea" onchange="renderCards()"><option value="">All Areas</option></select></div>
+    <div class="tg"><label>Follow-Up</label>
       <select id="fFollowup" onchange="renderCards()">
         <option value="">All</option>
         <option value="overdue">⚠ Overdue</option>
@@ -303,24 +286,11 @@ Team NOSH7 🌱
         <option value="upcoming">📅 Upcoming</option>
       </select>
     </div>
-    <div class="tg">
-      <label>Last Delivery From</label>
-      <input type="date" id="fLdFrom" onchange="renderCards()">
-    </div>
-    <div class="tg">
-      <label>To</label>
-      <input type="date" id="fLdTo" onchange="renderCards()">
-    </div>
-    <div class="tg" id="ldClear" style="display:none">
-      <button class="btn btn-outline btn-sm" onclick="clearDates()">✕ Dates</button>
-    </div>
-    <div class="tg">
-      <label>Search</label>
-      <input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:140px">
-    </div>
-    <div style="margin-left:auto">
-      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export</button>
-    </div>
+    <div class="tg"><label>Last Delivery From</label><input type="date" id="fLdFrom" onchange="renderCards()"></div>
+    <div class="tg"><label>To</label><input type="date" id="fLdTo" onchange="renderCards()"></div>
+    <div class="tg" id="ldClear" style="display:none"><button class="btn btn-outline btn-sm" onclick="clearDates()">✕ Dates</button></div>
+    <div class="tg"><label>Search</label><input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:140px"></div>
+    <div style="margin-left:auto"><button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export</button></div>
   </div>
 
   <!-- STATS BAR -->
@@ -335,8 +305,7 @@ Team NOSH7 🌱
   <div class="modal">
     <h2>📝 Update Status</h2>
     <div class="msub" id="statusSub">Update the outcome of your contact</div>
-    <div class="fg">
-      <label>Outcome</label>
+    <div class="fg"><label>Outcome</label>
       <select id="mStatus">
         <option value="Contacted">Contacted</option>
         <option value="Interested">Interested — wants to renew</option>
@@ -355,58 +324,24 @@ Team NOSH7 🌱
   </div>
 </div>
 
-<!-- SYNC MODAL (backup / restore for mobile) -->
-<div class="overlay hidden" id="syncModal">
-  <div class="modal">
-    <h2>📱 Sync to Another Device</h2>
-    <div class="msub">Backup all data and restore it on your phone or any browser</div>
-    <div class="sync-tabs">
-      <div class="sync-tab active" onclick="switchTab('backup')">📋 Backup</div>
-      <div class="sync-tab" onclick="switchTab('restore')">📥 Restore</div>
-    </div>
-
-    <div class="sync-panel active" id="tabBackup">
-      <p style="font-size:13px;color:var(--gray-600);margin-bottom:10px">
-        Copy the code below and paste it on your other device using the Restore tab.
-      </p>
-      <textarea class="backup-area" id="backupCode" readonly rows="5"></textarea>
-      <div class="sync-note">
-        ℹ️ This code contains all your members, statuses and notes. <br>
-        On the other device: open the same link → tap 📱 Sync → Restore tab → paste → tap Restore.
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-outline" onclick="closeSyncModal()">Close</button>
-        <button class="btn btn-green" onclick="copyBackup()">📋 Copy Code</button>
-      </div>
-    </div>
-
-    <div class="sync-panel" id="tabRestore">
-      <p style="font-size:13px;color:var(--gray-600);margin-bottom:10px">
-        Paste the backup code from your other device below.
-      </p>
-      <textarea class="backup-area" id="restoreCode" placeholder="Paste backup code here…" rows="5"></textarea>
-      <div class="sync-note" style="color:#991b1b">
-        ⚠️ This will REPLACE all current data on this device with the backup.
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-outline" onclick="closeSyncModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="doRestore()">📥 Restore Data</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
 <div class="toast hidden" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-// CONSTANTS
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════
+const SB_URL  = 'https://sqosmiifjqecidxhyjtg.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb3NtaWlmanFlY2lkeGh5anRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDczNzQsImV4cCI6MjA4ODM4MzM3NH0.xAVThNZNjRbZ5ObA721XZLexUiRUIVSXx0UZNs0ZwTI';
+const SESSION = 'nosh7_altaf'; // unique key for this user's data
+
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// ═══════════════════════════════════════════
+// LOCAL CACHE KEYS
+// ═══════════════════════════════════════════
 const SK  = 'nosh7_members_v1';
 const TK  = 'nosh7_wa_template';
 const PK  = 'nosh7_pending';
-const TSK = 'nosh7_saved_at';
 
 const COL = {
   name:'Name', phone:'Phone', product:'Product', price:'Price per unit',
@@ -415,201 +350,250 @@ const COL = {
   slot:'Delivery Slot', planName:'Plan Name', planQuota:'Plan quota',
   remaining:'Remaining quota', route:'Route', area:'Area', zone:'Zone', balance:'Customer Balance',
 };
-
 const LIVE_RE = /^active$|^live$|^running$/i;
 
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 let members        = [];
 let pendingContact = null;
 let tplOpen        = false;
 let batchOpen      = false;
-let activeFilter   = 'all'; // 'all' | 'active' | number (exact remaining)
+let activeFilter   = 'all';
+let _pushing       = false; // prevent re-entrant pushes
 
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  members = load();
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  // 1. Load from local cache immediately (instant UI)
+  members = loadLocal();
   loadTemplate();
-  try { pendingContact = JSON.parse(localStorage.getItem(PK) || 'null'); } catch {}
+  try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
 
-  if (members.length > 0) {
-    showMain();
-    populateDropdowns();
-    renderAll();
-    const ts = localStorage.getItem(TSK);
-    if (ts) {
-      const d = new Date(ts);
-      toast(`💾 Restored ${members.length} members — saved ${d.toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}`, 'ok');
+  if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
+
+  setSyncStatus('syncing', 'Syncing…');
+
+  // 2. Pull latest from cloud and merge
+  try {
+    const { data, error } = await sb.from('nosh7_sessions').select('members').eq('id', SESSION).maybeSingle();
+    if (!error && data?.members?.length) {
+      members = mergeMembers(members, data.members);
+      saveLocal();
+      if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
     }
+    setSyncStatus('live', 'Live');
+  } catch(e) {
+    setSyncStatus('offline', 'Offline');
   }
 
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && pendingContact) setTimeout(triggerModal, 400); });
-  window.addEventListener('focus', () => { if (pendingContact) setTimeout(triggerModal, 400); });
+  // 3. Subscribe to realtime changes
+  subscribeRealtime();
+
+  // 4. Visibility / focus events for pending contact
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && pendingContact) setTimeout(triggerModal,400); });
+  window.addEventListener('focus', () => { if (pendingContact) setTimeout(triggerModal,400); });
 });
 
-// ══════════════════════════════════════════
-// STORAGE
-// ══════════════════════════════════════════
-function load() { try { return JSON.parse(localStorage.getItem(SK) || '[]'); } catch { return []; } }
-function save() {
-  localStorage.setItem(SK, JSON.stringify(members));
-  const now = new Date().toISOString();
-  localStorage.setItem(TSK, now);
-  const d = new Date(now);
-  const badge = document.getElementById('saveBadge');
-  badge.textContent = '💾 ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  badge.style.display = '';
+// ═══════════════════════════════════════════
+// SYNC STATUS INDICATOR
+// ═══════════════════════════════════════════
+function setSyncStatus(state, label) {
+  const dot   = document.getElementById('syncDot');
+  const lbl   = document.getElementById('syncLabel');
+  dot.className = 'sync-dot ' + (state === 'live' ? '' : state);
+  lbl.textContent = label;
 }
 
-// ══════════════════════════════════════════
-// FILE HANDLING
-// ══════════════════════════════════════════
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+// ═══════════════════════════════════════════
+// REALTIME SUBSCRIPTION
+// ═══════════════════════════════════════════
+function subscribeRealtime() {
+  sb.channel('nosh7_rt')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'nosh7_sessions',
+      filter: `id=eq.${SESSION}`
+    }, payload => {
+      if (_pushing) return; // ignore echo of our own push
+      const remote = payload.new?.members;
+      if (!Array.isArray(remote)) return;
+      members = mergeMembers(members, remote);
+      saveLocal();
+      populateDropdowns();
+      renderAll();
+      setSyncStatus('live', 'Live');
+      toast('🔄 Synced from another device', 'ok');
+    })
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED')    setSyncStatus('live',    'Live');
+      if (status === 'CLOSED')        setSyncStatus('offline', 'Offline');
+      if (status === 'CHANNEL_ERROR') setSyncStatus('offline', 'Offline');
+    });
 }
-function handleFileUpload(e) { if (e.target.files[0]) processFile(e.target.files[0]); e.target.value=''; }
-function processFile(file) {
-  const r = new FileReader();
-  r.onload = e => {
+
+// ═══════════════════════════════════════════
+// MERGE — conflict resolution by _modifiedAt
+// If a member exists on both sides, keep the one with the more recent _modifiedAt.
+// Members only on one side are kept as-is.
+// ═══════════════════════════════════════════
+function mergeMembers(local, remote) {
+  const map = new Map();
+  [...local, ...remote].forEach(m => {
+    const existing = map.get(m._uid);
+    if (!existing) { map.set(m._uid, m); return; }
+    const tE = new Date(existing._modifiedAt || existing.addedOn || 0).getTime();
+    const tM = new Date(m._modifiedAt        || m.addedOn        || 0).getTime();
+    if (tM > tE) map.set(m._uid, m);
+  });
+  return [...map.values()];
+}
+
+// ═══════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem(SK)||'[]'); } catch { return []; }
+}
+function saveLocal() {
+  localStorage.setItem(SK, JSON.stringify(members));
+}
+async function save() {
+  saveLocal();
+  // Push to Supabase (debounced slightly to batch rapid changes)
+  clearTimeout(save._t);
+  save._t = setTimeout(async () => {
     try {
-      const rows = parseCSV(e.target.result);
-      if (rows.length < 2) { toast('CSV empty or invalid','err'); return; }
+      _pushing = true;
+      setSyncStatus('syncing', 'Saving…');
+      await sb.from('nosh7_sessions').upsert({ id: SESSION, members, updated_at: new Date().toISOString() });
+      setSyncStatus('live', 'Live');
+    } catch(e) {
+      setSyncStatus('offline', 'Offline');
+      toast('⚠️ Sync failed — working offline', 'err');
+    } finally {
+      _pushing = false;
+    }
+  }, 600);
+}
+
+// ═══════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════
+function handleDrop(e) { e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag-over'); if(e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
+function handleFileUpload(e) { if(e.target.files[0]) processFile(e.target.files[0]); e.target.value=''; }
+function processFile(file) {
+  const r=new FileReader();
+  r.onload=e=>{
+    try {
+      const rows=parseCSV(e.target.result);
+      if(rows.length<2){toast('CSV empty','err');return;}
       importMembers(rows[0].map(h=>h.trim()), rows.slice(1).filter(r=>r.some(c=>c.trim())));
-    } catch(err) { toast('Error: '+err.message,'err'); }
+    } catch(err){toast('Error: '+err.message,'err');}
   };
   r.readAsText(file);
 }
 function parseCSV(text) {
-  const rows = [];
-  for (const line of text.split(/\r?\n/)) {
-    if (!line.trim()) continue;
-    const row=[]; let cell='', inQ=false;
-    for (let i=0;i<line.length;i++) {
+  const rows=[];
+  for(const line of text.split(/\r?\n/)){
+    if(!line.trim()) continue;
+    const row=[]; let cell='',inQ=false;
+    for(let i=0;i<line.length;i++){
       const c=line[i];
-      if (c==='"'&&!inQ) { inQ=true; }
-      else if (c==='"'&&inQ&&line[i+1]==='"') { cell+='"'; i++; }
-      else if (c==='"'&&inQ) { inQ=false; }
-      else if ((c===','||c==='\t')&&!inQ) { row.push(cell.trim()); cell=''; }
-      else { cell+=c; }
+      if(c==='"'&&!inQ){inQ=true;}
+      else if(c==='"'&&inQ&&line[i+1]==='"'){cell+='"';i++;}
+      else if(c==='"'&&inQ){inQ=false;}
+      else if((c===','||c==='\t')&&!inQ){row.push(cell.trim());cell='';}
+      else{cell+=c;}
     }
     row.push(cell.trim()); rows.push(row);
   }
   return rows;
 }
 
-// ══════════════════════════════════════════
-// IMPORT — only new phone+plan combos
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// IMPORT — adds only new phone+plan combos
+// ═══════════════════════════════════════════
 function importMembers(headers, rows) {
-  const idx = col => headers.indexOf(col);
-  const get = (row,col) => { const i=idx(col); return i>=0?(row[i]||'').trim():''; };
-  const existing = new Map(members.map(m=>[m._uid,m]));
-  let added=0, skipped=0;
+  const idx=col=>headers.indexOf(col);
+  const get=(row,col)=>{const i=idx(col);return i>=0?(row[i]||'').trim():'';};
+  const existing=new Map(members.map(m=>[m._uid,m]));
+  let added=0,skipped=0;
 
-  rows.forEach(row => {
-    const phone = normalPhone(get(row,COL.phone));
-    if (!phone) return;
-    const plan = get(row,COL.planName);
-    const uid  = phone+'||'+plan;
-    if (existing.has(uid)) { skipped++; return; }
-    const m = {
-      _uid:uid, phone,
-      name:get(row,COL.name)||'Unknown',
+  rows.forEach(row=>{
+    const phone=normalPhone(get(row,COL.phone)); if(!phone) return;
+    const plan=get(row,COL.planName);
+    const uid=phone+'||'+plan;
+    if(existing.has(uid)){skipped++;return;}
+    const m={
+      _uid:uid, phone, name:get(row,COL.name)||'Unknown',
       product:get(row,COL.product), price:get(row,COL.price),
       quantity:get(row,COL.quantity), csvStatus:get(row,COL.status),
       subStart:get(row,COL.subStart), subEnd:get(row,COL.subEnd),
       lastDelivery:get(row,COL.lastDelivery), slot:get(row,COL.slot),
-      planName:plan, planQuota:get(row,COL.planQuota),
-      remaining:get(row,COL.remaining),
-      route:get(row,COL.route), area:get(row,COL.area),
-      zone:get(row,COL.zone), balance:get(row,COL.balance),
-      // user-managed
+      planName:plan, planQuota:get(row,COL.planQuota), remaining:get(row,COL.remaining),
+      route:get(row,COL.route), area:get(row,COL.area), zone:get(row,COL.zone), balance:get(row,COL.balance),
       status:'Pending', followUpDate:'', notes:'',
-      lastContacted:null, lastMethod:null, addedOn:todayStr(),
+      lastContacted:null, lastMethod:null,
+      addedOn:todayStr(), _modifiedAt:new Date().toISOString(),
     };
     members.push(m); existing.set(uid,m); added++;
   });
 
   save(); populateDropdowns(); renderAll(); showMain();
-  toast(added>0 ? `✅ ${added} new members added · ${skipped} already saved` : `No new members · ${skipped} already in system`, added>0?'ok':'');
+  toast(added>0?`✅ ${added} new members added · ${skipped} already saved`:`No new members · ${skipped} already saved`, added>0?'ok':'');
 }
-function normalPhone(p) { return (p||'').replace(/\D/g,'').replace(/^91/,'').slice(-10); }
+function normalPhone(p){return(p||'').replace(/\D/g,'').replace(/^91/,'').slice(-10);}
 
-// ══════════════════════════════════════════
-// SMART FILTER (hide free plans when another plan is live)
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// SMART FILTER
+// ═══════════════════════════════════════════
 function smartFilter(list) {
-  const byPhone = {};
-  list.forEach(m => { (byPhone[m.phone]=byPhone[m.phone]||[]).push(m); });
-  const out = [];
-  for (const g of Object.values(byPhone)) {
-    const hasLive = g.some(m => LIVE_RE.test(m.csvStatus));
-    g.forEach(m => {
-      if (hasLive && (parseFloat(m.price)||0) < 2) return;
-      out.push(m);
-    });
+  const byPhone={};
+  list.forEach(m=>{(byPhone[m.phone]=byPhone[m.phone]||[]).push(m);});
+  const out=[];
+  for(const g of Object.values(byPhone)){
+    const hasLive=g.some(m=>LIVE_RE.test(m.csvStatus));
+    g.forEach(m=>{if(hasLive&&(parseFloat(m.price)||0)<2) return; out.push(m);});
   }
   return out;
 }
 
-// ══════════════════════════════════════════
-// QUOTA CHIPS — dynamic from actual data
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// QUOTA CHIPS — dynamic from data
+// ═══════════════════════════════════════════
 function buildQuotaChips() {
-  const list = smartFilter(members);
-
-  // Count per remaining value
-  const counts = {};
-  list.forEach(m => {
-    const rem = m.remaining === '' || m.remaining === '-' ? null : parseFloat(m.remaining);
-    if (rem === null || isNaN(rem)) return;
-    counts[rem] = (counts[rem]||0)+1;
+  const list=smartFilter(members);
+  const counts={};
+  list.forEach(m=>{
+    const rem=parseFloat(m.remaining);
+    if(!isNaN(rem)) counts[rem]=(counts[rem]||0)+1;
   });
-
-  const totalActive = list.filter(m => (parseFloat(m.remaining)||0) > 0).length;
-  const sortedVals  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-
-  const chips = [];
-
-  // "All" chip
-  chips.push(`<div class="qchip${activeFilter==='all'?' active':''}" onclick="setFilter('all')">All (${list.length})</div>`);
-
-  // "Active > 0" chip
-  chips.push(`<div class="qchip${activeFilter==='active'?' active':''}" onclick="setFilter('active')">🟢 Active &gt;0 (${totalActive})</div>`);
-
-  // One chip per distinct remaining value
-  sortedVals.forEach(v => {
-    const cnt  = counts[v];
-    const icon = v===0 ? '🔴' : v<=5 ? '🟠' : '🟢';
-    const sel  = activeFilter===v ? ' active' : '';
-    chips.push(`<div class="qchip${sel}" onclick="setFilter(${v})">${icon} ${v} left (${cnt})</div>`);
-  });
-
-  document.getElementById('quotaChips').innerHTML = chips.join('');
+  const activeCount=list.filter(m=>(parseFloat(m.remaining)||0)>0).length;
+  const sortedVals=Object.keys(counts).map(Number).sort((a,b)=>a-b);
+  const chips=[
+    `<div class="qchip${activeFilter==='all'?' active':''}" onclick="setFilter('all')">All (${list.length})</div>`,
+    `<div class="qchip${activeFilter==='active'?' active':''}" onclick="setFilter('active')">🟢 Active &gt;0 (${activeCount})</div>`,
+    ...sortedVals.map(v=>{
+      const icon=v===0?'🔴':v<=5?'🟠':'🟢';
+      return `<div class="qchip${activeFilter===v?' active':''}" onclick="setFilter(${v})">${icon} ${v} left (${counts[v]})</div>`;
+    })
+  ];
+  document.getElementById('quotaChips').innerHTML=chips.join('');
 }
+function setFilter(val){activeFilter=val; buildQuotaChips(); renderCards();}
 
-function setFilter(val) {
-  activeFilter = val;
-  buildQuotaChips(); // re-render chips to update highlight
-  renderCards();
-}
-
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // DASHBOARD
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 function renderDashboard() {
-  const list   = smartFilter(members);
-  const active = list.filter(m => (parseFloat(m.remaining)||0) > 0);
-  const totalPending  = active.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
-  const sc = {};
-  members.forEach(m => sc[m.status]=(sc[m.status]||0)+1);
+  const list=smartFilter(members);
+  const active=list.filter(m=>(parseFloat(m.remaining)||0)>0);
+  const totalPending=active.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
+  const sc={};
+  members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
 
-  document.getElementById('dashKpis').innerHTML = `
+  document.getElementById('dashKpis').innerHTML=`
     <div class="dash-kpi green"><div class="kpi-num">${active.length}</div><div class="kpi-label">🟢 Active Customers</div></div>
     <div class="dash-kpi blue"><div class="kpi-num">${totalPending}</div><div class="kpi-label">📦 Total Pending Deliveries</div></div>
     <div class="dash-kpi orange"><div class="kpi-num">${sc['Follow-Up']||0}</div><div class="kpi-label">🔔 Follow-Up Pending</div></div>
@@ -618,91 +602,73 @@ function renderDashboard() {
     <div class="dash-kpi"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
   `;
 
-  // Batch table — group active by route
-  const byRoute = {};
-  active.forEach(m => {
-    const key = m.route||m.area||'Unknown';
-    if (!byRoute[key]) byRoute[key]={count:0,deliveries:0};
+  const byRoute={};
+  active.forEach(m=>{
+    const key=m.route||m.area||'Unknown';
+    if(!byRoute[key]) byRoute[key]={count:0,deliveries:0};
     byRoute[key].count++;
-    byRoute[key].deliveries += parseFloat(m.remaining)||0;
+    byRoute[key].deliveries+=parseFloat(m.remaining)||0;
   });
-  const maxC   = Math.max(1,...Object.values(byRoute).map(r=>r.count));
-  const sorted = Object.entries(byRoute).sort((a,b)=>b[1].count-a[1].count);
-
-  document.getElementById('batchRows').innerHTML = sorted.length
-    ? sorted.map(([route,d]) => `
-        <tr>
-          <td class="td-name">${esc(route)}</td>
-          <td class="td-num">${d.count}</td>
-          <td class="td-num">${d.deliveries}</td>
-          <td class="td-num">${(d.deliveries/d.count).toFixed(1)}</td>
-          <td><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(d.count/maxC*100)}%"></div></div></td>
-        </tr>`).join('')
-    : `<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:18px">No active customers</td></tr>`;
+  const maxC=Math.max(1,...Object.values(byRoute).map(r=>r.count));
+  const sorted=Object.entries(byRoute).sort((a,b)=>b[1].count-a[1].count);
+  document.getElementById('batchRows').innerHTML=sorted.length
+    ?sorted.map(([route,d])=>`
+      <tr>
+        <td class="td-name">${esc(route)}</td>
+        <td class="td-num">${d.count}</td>
+        <td class="td-num">${d.deliveries}</td>
+        <td class="td-num">${(d.deliveries/d.count).toFixed(1)}</td>
+        <td><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(d.count/maxC*100)}%"></div></div></td>
+      </tr>`).join('')
+    :`<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:18px">No active customers</td></tr>`;
 }
+function toggleBatch(){batchOpen=!batchOpen;document.getElementById('batchBody').style.display=batchOpen?'':'none';document.getElementById('batchToggle').textContent=batchOpen?'▲ collapse':'▼ expand';}
 
-function toggleBatch() {
-  batchOpen = !batchOpen;
-  document.getElementById('batchBody').style.display = batchOpen?'':'none';
-  document.getElementById('batchToggle').textContent = batchOpen?'▲ collapse':'▼ expand';
-}
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderAll(){renderDashboard();buildQuotaChips();renderCards();updateHeader();}
 
-// ══════════════════════════════════════════
-// RENDER ALL
-// ══════════════════════════════════════════
-function renderAll() { renderDashboard(); buildQuotaChips(); renderCards(); updateHeader(); }
-
-// ══════════════════════════════════════════
-// RENDER CARDS
-// ══════════════════════════════════════════
 function renderCards() {
-  const fStat   = document.getElementById('fStatus').value;
-  const fPlan   = document.getElementById('fPlan').value;
-  const fArea   = document.getElementById('fArea').value;
-  const fFU     = document.getElementById('fFollowup').value;
-  const fLdFrom = document.getElementById('fLdFrom').value;
-  const fLdTo   = document.getElementById('fLdTo').value;
-  const search  = document.getElementById('fSearch').value.toLowerCase();
-  const today   = todayStr();
+  const fStat=document.getElementById('fStatus').value;
+  const fPlan=document.getElementById('fPlan').value;
+  const fArea=document.getElementById('fArea').value;
+  const fFU=document.getElementById('fFollowup').value;
+  const fLdFrom=document.getElementById('fLdFrom').value;
+  const fLdTo=document.getElementById('fLdTo').value;
+  const search=document.getElementById('fSearch').value.toLowerCase();
+  const today=todayStr();
 
-  let list = smartFilter(members);
+  let list=smartFilter(members);
 
-  // ── Quota filter ──
-  if (activeFilter === 'active') {
-    // show only members with remaining > 0
-    list = list.filter(m => { const r=parseFloat(m.remaining); return !isNaN(r) && r > 0; });
-  } else if (activeFilter !== 'all') {
-    // exact match on the clicked remaining value
-    list = list.filter(m => { const r=parseFloat(m.remaining); return !isNaN(r) && r === activeFilter; });
-  }
+  if(activeFilter==='active')         list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r>0;});
+  else if(activeFilter!=='all')        list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r===activeFilter;});
 
-  if (fStat) list = list.filter(m => m.status===fStat);
-  if (fPlan) list = list.filter(m => m.planName===fPlan);
-  if (fArea) list = list.filter(m => m.area===fArea||m.route===fArea);
-  if (fFU==='today')    list = list.filter(m => m.followUpDate===today);
-  if (fFU==='overdue')  list = list.filter(m => m.followUpDate&&m.followUpDate<today);
-  if (fFU==='upcoming') list = list.filter(m => m.followUpDate&&m.followUpDate>today);
+  if(fStat) list=list.filter(m=>m.status===fStat);
+  if(fPlan) list=list.filter(m=>m.planName===fPlan);
+  if(fArea) list=list.filter(m=>m.area===fArea||m.route===fArea);
+  if(fFU==='today')    list=list.filter(m=>m.followUpDate===today);
+  if(fFU==='overdue')  list=list.filter(m=>m.followUpDate&&m.followUpDate<today);
+  if(fFU==='upcoming') list=list.filter(m=>m.followUpDate&&m.followUpDate>today);
 
-  if (fLdFrom||fLdTo) {
+  if(fLdFrom||fLdTo){
     document.getElementById('ldClear').style.display='';
-    list = list.filter(m => {
+    list=list.filter(m=>{
       const ld=(m.lastDelivery||'').split(' ')[0];
-      if (!ld||ld==='-') return false;
-      if (fLdFrom&&ld<fLdFrom) return false;
-      if (fLdTo  &&ld>fLdTo)   return false;
+      if(!ld||ld==='-') return false;
+      if(fLdFrom&&ld<fLdFrom) return false;
+      if(fLdTo  &&ld>fLdTo)   return false;
       return true;
     });
   } else { document.getElementById('ldClear').style.display='none'; }
 
-  if (search) list = list.filter(m => m.name.toLowerCase().includes(search)||m.phone.includes(search));
-
+  if(search) list=list.filter(m=>m.name.toLowerCase().includes(search)||m.phone.includes(search));
   list.sort((a,b)=>sortScore(a,today)-sortScore(b,today)||a.name.localeCompare(b.name));
 
-  // Stats bar
   const sc={};
   members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
-  const totPending = members.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
-  document.getElementById('statsBar').innerHTML = `
+  const totPending=members.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
+  document.getElementById('statsBar').innerHTML=`
     <div class="sc blue"><span class="n">${list.length}</span>Showing</div>
     <div class="sc"><span class="n">${sc['Pending']||0}</span>Pending</div>
     <div class="sc orange"><span class="n">${sc['Follow-Up']||0}</span>Follow-Up</div>
@@ -711,60 +677,49 @@ function renderCards() {
     <div class="sc purple"><span class="n">${totPending}</span>Total Pending Deliveries</div>
   `;
 
-  // Hint
-  if (activeFilter==='all') document.getElementById('qbHint').textContent='';
-  else if (activeFilter==='active') document.getElementById('qbHint').textContent=`showing ${list.length} active members`;
-  else document.getElementById('qbHint').textContent=`showing ${list.length} members with exactly ${activeFilter} deliveries left`;
+  if(activeFilter==='all')         document.getElementById('qbHint').textContent='';
+  else if(activeFilter==='active') document.getElementById('qbHint').textContent=`${list.length} active members with deliveries remaining`;
+  else                             document.getElementById('qbHint').textContent=`${list.length} members with exactly ${activeFilter} deliveries left`;
 
-  const grid = document.getElementById('cardsGrid');
-  if (!list.length) {
-    grid.innerHTML=`<div class="empty-state"><h3>No members match</h3><p>Try a different filter above</p></div>`;
-    return;
-  }
-  grid.innerHTML = list.map(m=>buildCard(m,today)).join('');
+  const grid=document.getElementById('cardsGrid');
+  if(!list.length){grid.innerHTML=`<div class="empty-state"><h3>No members match</h3><p>Try a different filter</p></div>`;return;}
+  grid.innerHTML=list.map(m=>buildCard(m,today)).join('');
 }
 
-function sortScore(m,today) {
-  if (m.followUpDate&&m.followUpDate<today) return 0;
-  if (m.followUpDate===today)               return 1;
+function sortScore(m,today){
+  if(m.followUpDate&&m.followUpDate<today) return 0;
+  if(m.followUpDate===today)               return 1;
   const r=parseFloat(m.remaining);
-  if (!isNaN(r)&&r===0) return 2;
-  if (!isNaN(r)&&r<=5)  return 3;
+  if(!isNaN(r)&&r===0) return 2;
+  if(!isNaN(r)&&r<=5)  return 3;
   return 4;
 }
 
-function buildCard(m,today) {
-  const sc  = (m.status||'Pending').toLowerCase().replace(/[\s-]+/g,'');
-  const rem = parseFloat(m.remaining);
+function buildCard(m,today){
+  const sc=(m.status||'Pending').toLowerCase().replace(/[\s-]+/g,'');
+  const rem=parseFloat(m.remaining);
   let qchip='';
-  if (!isNaN(rem)) {
-    const cls=rem===0?'qc-zero':rem<=5?'qc-low':'qc-ok';
-    qchip=`<span class="qchip-card ${cls}">${rem===0?'🔴':rem<=5?'🟠':'🟢'} ${rem} deliveries left</span>`;
-  }
+  if(!isNaN(rem)){const cls=rem===0?'qc-zero':rem<=5?'qc-low':'qc-ok';qchip=`<span class="qchip-card ${cls}">${rem===0?'🔴':rem<=5?'🟠':'🟢'} ${rem} deliveries left</span>`;}
   let fup='';
-  if (m.followUpDate) {
-    if (m.followUpDate<today)       fup=`<div class="fupill fp-overdue">⚠️ Overdue: ${m.followUpDate}</div>`;
-    else if (m.followUpDate===today) fup=`<div class="fupill fp-today">🔔 Follow up TODAY</div>`;
+  if(m.followUpDate){
+    if(m.followUpDate<today)        fup=`<div class="fupill fp-overdue">⚠️ Overdue: ${m.followUpDate}</div>`;
+    else if(m.followUpDate===today)  fup=`<div class="fupill fp-today">🔔 Follow up TODAY</div>`;
     else                             fup=`<div class="fupill fp-upcoming">📅 Follow-up: ${m.followUpDate}</div>`;
   }
   const rows=[
-    m.product     && ['Product',     m.product],
-    m.planName    && ['Plan',        m.planName],
-    m.price       && ['Price/unit',  '₹'+m.price],
-    m.slot        && ['Slot',        m.slot],
-    m.area        && ['Area',        m.area+(m.zone&&m.zone!==m.area?' · '+m.zone:'')],
+    m.product     &&['Product',    m.product],
+    m.planName    &&['Plan',       m.planName],
+    m.price       &&['Price/unit', '₹'+m.price],
+    m.slot        &&['Slot',       m.slot],
+    m.area        &&['Area',       m.area+(m.zone&&m.zone!==m.area?' · '+m.zone:'')],
     m.lastDelivery&&m.lastDelivery!=='-'&&['Last Delivery',m.lastDelivery.split(' ')[0]],
     m.balance&&parseFloat(m.balance)!=0&&['Balance','₹'+m.balance],
   ].filter(Boolean);
-
-  const sid = m._uid.replace(/[^a-z0-9]/gi,'_');
+  const sid=m._uid.replace(/[^a-z0-9]/gi,'_');
   return `
 <div class="card s-${sc}">
   <div class="card-hdr">
-    <div>
-      <div class="card-name">${esc(m.name)}</div>
-      <div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div>
-    </div>
+    <div><div class="card-name">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
     <span class="sbadge b-${sc}">${m.status}</span>
   </div>
   <div class="card-body">
@@ -780,177 +735,98 @@ function buildCard(m,today) {
 </div>`;
 }
 
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // CONTACT HANDLERS
-// ══════════════════════════════════════════
-function findM(sid) { return members.find(m=>m._uid.replace(/[^a-z0-9]/gi,'_')===sid); }
+// ═══════════════════════════════════════════
+function findM(sid){return members.find(m=>m._uid.replace(/[^a-z0-9]/gi,'_')===sid);}
+function onWA(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='WhatsApp';save();pendingContact={sid,method:'WhatsApp'};localStorage.setItem(PK,JSON.stringify(pendingContact));}
+function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='Call';save();pendingContact={sid,method:'Call'};localStorage.setItem(PK,JSON.stringify(pendingContact));setTimeout(triggerModal,1200);}
+function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
+function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
 
-function onWA(sid) {
-  const m=findM(sid); if(!m) return;
-  m.lastContacted=new Date().toISOString(); m.lastMethod='WhatsApp'; save();
-  pendingContact={sid,method:'WhatsApp'}; localStorage.setItem(PK,JSON.stringify(pendingContact));
-}
-function onCall(sid) {
-  const m=findM(sid); if(!m) return;
-  m.lastContacted=new Date().toISOString(); m.lastMethod='Call'; save();
-  pendingContact={sid,method:'Call'}; localStorage.setItem(PK,JSON.stringify(pendingContact));
-  setTimeout(triggerModal,1200);
-}
-function triggerModal() {
-  if (!pendingContact) return;
-  const m=findM(pendingContact.sid); if(!m){clearPending();return;}
-  openStatus(pendingContact.sid,pendingContact.method);
-}
-function clearPending() { pendingContact=null; localStorage.removeItem(PK); }
-
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // STATUS MODAL
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 let _sid=null;
-function openStatus(sid,method) {
-  _sid=sid; const m=findM(sid); if(!m) return;
-  document.getElementById('statusSub').textContent=method
-    ?`You ${method==='WhatsApp'?'messaged':'called'} ${m.name} — what was the outcome?`
-    :`Update status for ${m.name} (${m.phone})`;
+function openStatus(sid,method){
+  _sid=sid;const m=findM(sid);if(!m)return;
+  document.getElementById('statusSub').textContent=method?`You ${method==='WhatsApp'?'messaged':'called'} ${m.name} — outcome?`:`Update: ${m.name} (${m.phone})`;
   document.getElementById('mStatus').value=m.status==='Pending'?'Contacted':m.status;
   document.getElementById('mDate').value=m.followUpDate||'';
   document.getElementById('mNotes').value=m.notes||'';
   document.getElementById('statusModal').classList.remove('hidden');
 }
-function closeStatus() { document.getElementById('statusModal').classList.add('hidden'); clearPending(); _sid=null; }
-function saveStatus() {
-  if (!_sid) return;
-  const m=findM(_sid); if(!m) return;
+function closeStatus(){document.getElementById('statusModal').classList.add('hidden');clearPending();_sid=null;}
+function saveStatus(){
+  if(!_sid)return;const m=findM(_sid);if(!m)return;
   m.status      =document.getElementById('mStatus').value.split(' — ')[0];
   m.followUpDate=document.getElementById('mDate').value;
   m.notes       =document.getElementById('mNotes').value;
-  save(); closeStatus(); renderAll(); toast('Status updated ✅','ok');
+  m._modifiedAt =new Date().toISOString(); // stamp for conflict resolution
+  save();closeStatus();renderAll();toast('Status updated ✅','ok');
 }
 document.getElementById('statusModal').addEventListener('click',function(e){if(e.target===this)closeStatus();});
 
-// ══════════════════════════════════════════
-// SYNC MODAL (backup / restore)
-// ══════════════════════════════════════════
-function openSyncModal() {
-  // Generate backup code
-  const data = { members, savedAt: new Date().toISOString() };
-  document.getElementById('backupCode').value = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  document.getElementById('restoreCode').value = '';
-  switchTab('backup');
-  document.getElementById('syncModal').classList.remove('hidden');
-}
-function closeSyncModal() { document.getElementById('syncModal').classList.add('hidden'); }
-document.getElementById('syncModal').addEventListener('click',function(e){if(e.target===this)closeSyncModal();});
-
-function switchTab(tab) {
-  document.querySelectorAll('.sync-tab').forEach((el,i)=>{
-    el.classList.toggle('active', (i===0&&tab==='backup')||(i===1&&tab==='restore'));
-  });
-  document.getElementById('tabBackup').classList.toggle('active', tab==='backup');
-  document.getElementById('tabRestore').classList.toggle('active', tab==='restore');
-}
-
-function copyBackup() {
-  const el = document.getElementById('backupCode');
-  el.select();
-  try {
-    navigator.clipboard.writeText(el.value).then(()=>toast('✅ Code copied! Paste on your other device','ok'))
-      .catch(()=>{ document.execCommand('copy'); toast('✅ Copied!','ok'); });
-  } catch { document.execCommand('copy'); toast('✅ Copied!','ok'); }
-}
-
-function doRestore() {
-  const code = document.getElementById('restoreCode').value.trim();
-  if (!code) { toast('Paste backup code first','err'); return; }
-  try {
-    const data = JSON.parse(decodeURIComponent(escape(atob(code))));
-    if (!Array.isArray(data.members)) throw new Error('Invalid format');
-    if (!confirm(`Restore ${data.members.length} members from backup?\n\nThis will replace all current data on this device.`)) return;
-    members = data.members;
-    save();
-    closeSyncModal();
-    populateDropdowns();
-    renderAll();
-    showMain();
-    toast(`✅ Restored ${members.length} members from backup`,'ok');
-  } catch { toast('Invalid backup code — please check and try again','err'); }
-}
-
-// ══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // TEMPLATE
-// ══════════════════════════════════════════
-function loadTemplate() { const s=localStorage.getItem(TK); if(s) document.getElementById('waTemplate').value=s; }
-function saveTemplate()  { localStorage.setItem(TK,document.getElementById('waTemplate').value); toast('Template saved ✅','ok'); }
-function buildWAMsg(m) {
-  return (document.getElementById('waTemplate').value||'Hello {name}!')
+// ═══════════════════════════════════════════
+function loadTemplate(){const s=localStorage.getItem(TK);if(s)document.getElementById('waTemplate').value=s;}
+function saveTemplate(){localStorage.setItem(TK,document.getElementById('waTemplate').value);toast('Template saved ✅','ok');}
+function buildWAMsg(m){
+  return(document.getElementById('waTemplate').value||'Hello {name}!')
     .replace(/{name}/g,m.name||'').replace(/{phone}/g,m.phone||'')
     .replace(/{plan}/g,m.planName||'').replace(/{units}/g,m.remaining||'0')
     .replace(/{product}/g,m.product||'').replace(/{price}/g,m.price?'₹'+m.price:'')
     .replace(/{area}/g,m.area||'').replace(/{slot}/g,m.slot||'');
 }
-function togglePanel() {
-  tplOpen=!tplOpen;
-  document.getElementById('tplBody').style.display=tplOpen?'':'none';
-  document.getElementById('tplIcon').textContent=tplOpen?'▲ collapse':'▼ expand';
-}
+function togglePanel(){tplOpen=!tplOpen;document.getElementById('tplBody').style.display=tplOpen?'':'none';document.getElementById('tplIcon').textContent=tplOpen?'▲ collapse':'▼ expand';}
 
-// ══════════════════════════════════════════
-// DROPDOWNS
-// ══════════════════════════════════════════
-function populateDropdowns() {
+// ═══════════════════════════════════════════
+// DROPDOWNS / MISC
+// ═══════════════════════════════════════════
+function populateDropdowns(){
   const plans=[...new Set(members.map(m=>m.planName).filter(Boolean))].sort();
   const areas=[...new Set(members.map(m=>m.area||m.route).filter(Boolean))].sort();
-  const ps=document.getElementById('fPlan'), pc=ps.value;
-  ps.innerHTML='<option value="">All Plans</option>'+plans.map(p=>`<option>${esc(p)}</option>`).join('');
-  if(pc) ps.value=pc;
-  const as=document.getElementById('fArea'), ac=as.value;
-  as.innerHTML='<option value="">All Areas</option>'+areas.map(a=>`<option>${esc(a)}</option>`).join('');
-  if(ac) as.value=ac;
+  const ps=document.getElementById('fPlan'),pc=ps.value;
+  ps.innerHTML='<option value="">All Plans</option>'+plans.map(p=>`<option>${esc(p)}</option>`).join('');if(pc)ps.value=pc;
+  const as=document.getElementById('fArea'),ac=as.value;
+  as.innerHTML='<option value="">All Areas</option>'+areas.map(a=>`<option>${esc(a)}</option>`).join('');if(ac)as.value=ac;
 }
-function clearDates() { document.getElementById('fLdFrom').value=''; document.getElementById('fLdTo').value=''; renderCards(); }
+function clearDates(){document.getElementById('fLdFrom').value='';document.getElementById('fLdTo').value='';renderCards();}
 
-// ══════════════════════════════════════════
-// EXPORT
-// ══════════════════════════════════════════
-function exportCSV() {
-  if (!members.length) { toast('No data','err'); return; }
-  const cols=['name','phone','planName','product','price','remaining','planQuota','csvStatus','area','route','slot','status','followUpDate','notes','lastContacted','lastMethod','addedOn'];
-  const blob=new Blob([cols.join(',')+'\n'+members.map(m=>cols.map(c=>`"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`nosh7_outreach_${todayStr()}.csv`; a.click();
-}
-
-// ══════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════
-function showMain() {
+function showMain(){
   document.getElementById('uploadZone').style.display='none';
   document.getElementById('mainContent').style.display='';
-  const ts=localStorage.getItem(TSK);
-  if (ts) { const d=new Date(ts); const b=document.getElementById('saveBadge'); b.textContent='💾 '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); b.style.display=''; }
   updateHeader();
 }
-function updateHeader() {
+function updateHeader(){
   const active=smartFilter(members).filter(m=>(parseFloat(m.remaining)||0)>0).length;
   document.getElementById('headerSub').textContent=`${members.length} members · ${active} active`;
 }
-function confirmClear() {
-  if (!confirm('Delete ALL data? This cannot be undone.')) return;
-  members=[]; save();
+function confirmClear(){
+  if(!confirm('Delete ALL data on all devices? This cannot be undone.')) return;
+  members=[];saveLocal();
+  sb.from('nosh7_sessions').delete().eq('id',SESSION).then(()=>{});
   document.getElementById('uploadZone').style.display='';
   document.getElementById('mainContent').style.display='none';
-  document.getElementById('headerSub').textContent="Upload today's report to begin";
-  document.getElementById('saveBadge').style.display='none';
+  document.getElementById('headerSub').textContent='Connecting…';
   toast('Data cleared','err');
 }
 
-function todayStr()  { return new Date().toISOString().split('T')[0]; }
-function fmtDate(iso){ return iso?new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):''; }
-function esc(s)      { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function toast(msg,type='') {
+function exportCSV(){
+  if(!members.length){toast('No data','err');return;}
+  const cols=['name','phone','planName','product','price','remaining','planQuota','csvStatus','area','route','slot','status','followUpDate','notes','lastContacted','lastMethod','addedOn'];
+  const blob=new Blob([cols.join(',')+'\n'+members.map(m=>cols.map(c=>`"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nosh7_outreach_${todayStr()}.csv`;a.click();
+}
+
+function todayStr() {return new Date().toISOString().split('T')[0];}
+function fmtDate(iso){return iso?new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):''}
+function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg,type=''){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast '+type;
-  clearTimeout(t._t); t._t=setTimeout(()=>{t.className='toast hidden';},3800);
+  t.textContent=msg;t.className='toast '+type;
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.className='toast hidden';},3800);
 }
 </script>
 </body>
