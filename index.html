@@ -416,6 +416,17 @@ Team NOSH7 🌱
       </select>
     </div>
     <div class="toolbar-group">
+      <label>Last Delivery From</label>
+      <input type="date" id="filterLdFrom" onchange="renderCards()">
+    </div>
+    <div class="toolbar-group">
+      <label>Last Delivery To</label>
+      <input type="date" id="filterLdTo" onchange="renderCards()">
+    </div>
+    <div class="toolbar-group" id="ldClearBtn" style="display:none">
+      <button class="btn btn-outline btn-sm" onclick="clearLdFilter()">✕ Clear Dates</button>
+    </div>
+    <div class="toolbar-group">
       <label>Search</label>
       <input type="text" id="searchBox" placeholder="Name or phone…" oninput="renderCards()" style="min-width:150px">
     </div>
@@ -706,6 +717,23 @@ function renderCards() {
   if (filterFU === 'today')    list = list.filter(m => m.followUpDate === today);
   if (filterFU === 'overdue')  list = list.filter(m => m.followUpDate && m.followUpDate < today);
   if (filterFU === 'upcoming') list = list.filter(m => m.followUpDate && m.followUpDate > today);
+
+  // Last Delivery Date range filter
+  const ldFrom = document.getElementById('filterLdFrom').value;
+  const ldTo   = document.getElementById('filterLdTo').value;
+  if (ldFrom || ldTo) {
+    document.getElementById('ldClearBtn').style.display = '';
+    list = list.filter(m => {
+      const ld = (m.lastDelivery || '').split(' ')[0]; // take date part only
+      if (!ld || ld === '-') return false;
+      if (ldFrom && ld < ldFrom) return false;
+      if (ldTo   && ld > ldTo)   return false;
+      return true;
+    });
+  } else {
+    document.getElementById('ldClearBtn').style.display = 'none';
+  }
+
   if (search) list = list.filter(m =>
     m.name.toLowerCase().includes(search) || m.phone.includes(search)
   );
@@ -966,6 +994,12 @@ function setThreshold(v) {
 // ═══════════════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════════════
+function clearLdFilter() {
+  document.getElementById('filterLdFrom').value = '';
+  document.getElementById('filterLdTo').value   = '';
+  renderCards();
+}
+
 function exportCSV() {
   if (!members.length) { toast('No data to export', 'err'); return; }
   const cols = ['name','phone','planName','product','price','remaining','planQuota','csvStatus',
