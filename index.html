@@ -8,84 +8,40 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #25D366;
-  --green-dark: #128C7E;
-  --blue: #2563eb;
-  --blue-dark: #1d4ed8;
-  --orange: #f97316;
-  --red: #ef4444;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-700: #334155;
-  --gray-900: #0f172a;
-  --brand: #16a34a;
-  --brand-dark: #15803d;
+  --green: #25D366; --green-dark: #128C7E;
+  --blue: #2563eb;  --blue-dark: #1d4ed8;
+  --orange: #f97316; --red: #ef4444;
+  --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b;
+  --gray-700: #334155; --gray-900: #0f172a;
+  --brand: #16a34a; --brand-dark: #15803d;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--gray-100);
-  color: var(--gray-900);
-  min-height: 100vh;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gray-100); color: var(--gray-900); min-height: 100vh; }
 
 /* HEADER */
-.header {
-  background: var(--brand);
-  color: #fff;
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-}
-.header-logo { display: flex; align-items: center; gap: 10px; }
+.header { background: var(--brand); color: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .header-logo h1 { font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
-.header-logo .sub { font-size: 11px; opacity: .8; }
+.header-logo .sub { font-size: 11px; opacity: .8; margin-top: 1px; }
 .header-right { display: flex; gap: 8px; align-items: center; }
-.header-info { font-size: 12px; opacity: .85; }
+.save-badge { font-size: 11px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 20px; padding: 3px 10px; opacity: .85; }
 
 /* BUTTONS */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 8px; border: none;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  transition: all .15s; text-decoration: none; white-space: nowrap;
-}
-.btn-white { background: #fff; color: var(--brand); }
-.btn-white:hover { background: #f0fdf4; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap; }
 .btn-primary { background: var(--blue); color: #fff; }
 .btn-primary:hover { background: var(--blue-dark); }
-.btn-wa { background: var(--green); color: #fff; font-size: 12px; padding: 7px 11px; }
-.btn-wa:hover { background: var(--green-dark); }
+.btn-wa   { background: var(--green); color: #fff; font-size: 12px; padding: 7px 11px; }
+.btn-wa:hover   { background: var(--green-dark); }
 .btn-call { background: var(--blue); color: #fff; font-size: 12px; padding: 7px 11px; }
 .btn-call:hover { background: var(--blue-dark); }
 .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
 .btn-outline:hover { background: var(--gray-50); }
 .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
 .btn-ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); font-size: 12px; padding: 6px 12px; }
 .btn-ghost:hover { background: rgba(255,255,255,.15); }
 
 /* UPLOAD ZONE */
-.upload-zone {
-  border: 2px dashed var(--gray-300);
-  border-radius: 14px;
-  padding: 48px 24px;
-  text-align: center;
-  background: #fff;
-  cursor: pointer;
-  transition: all .2s;
-  margin: 24px;
-}
+.upload-zone { border: 2px dashed var(--gray-300); border-radius: 14px; padding: 48px 24px; text-align: center; background: #fff; cursor: pointer; transition: all .2s; margin: 24px; }
 .upload-zone:hover, .upload-zone.drag-over { border-color: var(--brand); background: #f0fdf4; }
 .upload-icon { font-size: 48px; margin-bottom: 14px; }
 .upload-zone h3 { font-size: 17px; font-weight: 700; color: var(--gray-700); margin-bottom: 6px; }
@@ -94,72 +50,66 @@ body {
 /* MAIN */
 .main { padding: 20px 24px; }
 
+/* ── DASHBOARD ──────────────────────────── */
+.dashboard { margin-bottom: 16px; }
+.dash-top { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.dash-kpi { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); border-top: 3px solid var(--gray-200); }
+.dash-kpi.green  { border-top-color: var(--brand); }
+.dash-kpi.blue   { border-top-color: var(--blue); }
+.dash-kpi.orange { border-top-color: var(--orange); }
+.dash-kpi.red    { border-top-color: var(--red); }
+.dash-kpi .kpi-num  { font-size: 28px; font-weight: 900; line-height: 1; }
+.dash-kpi.green  .kpi-num { color: var(--brand); }
+.dash-kpi.blue   .kpi-num { color: var(--blue); }
+.dash-kpi.orange .kpi-num { color: var(--orange); }
+.dash-kpi.red    .kpi-num { color: var(--red); }
+.dash-kpi .kpi-label { font-size: 11px; font-weight: 600; color: var(--gray-500); margin-top: 4px; }
+
+.dash-section { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden; }
+.dash-section-header { padding: 12px 16px; font-size: 13px; font-weight: 700; color: var(--gray-700); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.dash-section-header span { font-weight: 400; font-size: 12px; color: var(--gray-400); }
+.batch-table { width: 100%; border-collapse: collapse; }
+.batch-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-400); padding: 8px 16px; text-align: left; border-bottom: 1px solid var(--gray-100); }
+.batch-table td { padding: 9px 16px; font-size: 13px; border-bottom: 1px solid var(--gray-100); }
+.batch-table tr:last-child td { border-bottom: none; }
+.batch-table tr:hover td { background: var(--gray-50); }
+.batch-table .td-num { font-weight: 700; color: var(--gray-900); }
+.batch-bar-wrap { width: 120px; height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+.batch-bar { height: 100%; border-radius: 3px; background: var(--brand); }
+
 /* TOOLBAR */
-.toolbar {
-  background: #fff;
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
+.toolbar { background: #fff; border-radius: 12px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 .toolbar-group { display: flex; align-items: center; gap: 7px; }
 .toolbar label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .4px; }
-.toolbar select, .toolbar input[type=number], .toolbar input[type=text] {
-  border: 1px solid var(--gray-300); border-radius: 7px;
-  padding: 6px 10px; font-size: 13px; color: var(--gray-700); background: var(--gray-50);
-}
+.toolbar select, .toolbar input[type=number], .toolbar input[type=text], .toolbar input[type=date] { border: 1px solid var(--gray-300); border-radius: 7px; padding: 6px 10px; font-size: 13px; color: var(--gray-700); background: var(--gray-50); }
 .toolbar select:focus, .toolbar input:focus { outline: none; border-color: var(--brand); }
 
 /* STATS */
 .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-.stat-chip {
-  background: #fff; border-radius: 10px; padding: 10px 16px;
-  font-size: 11px; font-weight: 600; color: var(--gray-500);
-  box-shadow: 0 1px 3px rgba(0,0,0,.06); min-width: 80px;
-}
+.stat-chip { background: #fff; border-radius: 10px; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--gray-500); box-shadow: 0 1px 3px rgba(0,0,0,.06); min-width: 80px; cursor: default; }
 .stat-chip .num { font-size: 22px; font-weight: 800; display: block; color: var(--gray-900); line-height: 1.1; }
-.stat-chip.green .num { color: var(--brand); }
+.stat-chip.green .num  { color: var(--brand); }
 .stat-chip.orange .num { color: var(--orange); }
-.stat-chip.red .num { color: var(--red); }
-.stat-chip.blue .num { color: var(--blue); }
+.stat-chip.red .num    { color: var(--red); }
+.stat-chip.blue .num   { color: var(--blue); }
+.stat-chip.purple .num { color: #7c3aed; }
 
-/* CARDS GRID */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 14px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  overflow: hidden;
-  border-left: 4px solid var(--gray-300);
-  transition: box-shadow .18s, transform .18s;
-}
+/* CARDS */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; border-left: 4px solid var(--gray-300); transition: box-shadow .18s, transform .18s; }
 .card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.1); transform: translateY(-1px); }
-
-/* status colors */
-.card.s-pending        { border-left-color: #fbbf24; }
-.card.s-contacted      { border-left-color: var(--blue); }
-.card.s-interested     { border-left-color: #8b5cf6; }
-.card.s-followup       { border-left-color: var(--orange); }
-.card.s-converted      { border-left-color: var(--brand); }
-.card.s-notinterested  { border-left-color: var(--red); }
+.card.s-pending       { border-left-color: #fbbf24; }
+.card.s-contacted     { border-left-color: var(--blue); }
+.card.s-interested    { border-left-color: #8b5cf6; }
+.card.s-followup      { border-left-color: var(--orange); }
+.card.s-converted     { border-left-color: var(--brand); }
+.card.s-notinterested { border-left-color: var(--red); }
 
 .card-header { padding: 13px 15px 9px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.card-name { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+.card-name   { font-size: 14px; font-weight: 700; }
 .card-mobile { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
 
-.status-badge {
-  font-size: 10px; font-weight: 700;
-  padding: 3px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
-}
+.status-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
 .b-pending       { background: #fef9c3; color: #854d0e; }
 .b-contacted     { background: #dbeafe; color: #1e40af; }
 .b-interested    { background: #ede9fe; color: #5b21b6; }
@@ -168,133 +118,71 @@ body {
 .b-notinterested { background: #fee2e2; color: #991b1b; }
 
 .card-body { padding: 2px 15px 12px; }
-
-.card-row {
-  display: flex; justify-content: space-between;
-  font-size: 12px; padding: 2.5px 0; color: var(--gray-700);
-  border-bottom: 1px solid var(--gray-100);
-}
+.card-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2.5px 0; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); }
 .card-row:last-child { border-bottom: none; }
 .card-row .lbl { color: var(--gray-400); font-weight: 500; }
 .card-row .val { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; }
 
-/* quota chip */
-.quota-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 700;
-  padding: 2px 8px; border-radius: 20px; margin-top: 8px;
-}
+.quota-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 8px; }
 .quota-zero { background: #fee2e2; color: #991b1b; }
 .quota-low  { background: #ffedd5; color: #9a3412; }
 .quota-ok   { background: #dcfce7; color: #166534; }
 
-.followup-pill {
-  margin-top: 8px; padding: 5px 10px; border-radius: 7px;
-  font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px;
-}
+.followup-pill { margin-top: 8px; padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
 .fp-overdue  { background: #fee2e2; color: #991b1b; }
 .fp-today    { background: #fef9c3; color: #854d0e; }
 .fp-upcoming { background: #f0fdf4; color: #166534; }
 
-.notes-row {
-  margin-top: 8px; font-size: 11px; color: var(--gray-500);
-  background: var(--gray-50); border-radius: 6px; padding: 5px 8px;
-  font-style: italic;
-}
+.notes-row { margin-top: 8px; font-size: 11px; color: var(--gray-500); background: var(--gray-50); border-radius: 6px; padding: 5px 8px; font-style: italic; }
+.card-footer { padding: 9px 14px; border-top: 1px solid var(--gray-100); display: flex; gap: 7px; align-items: center; }
 
-.card-footer {
-  padding: 9px 14px; border-top: 1px solid var(--gray-100);
-  display: flex; gap: 7px; align-items: center;
-}
-
-/* FILTER BAR (units) */
-.quota-filter {
-  background: linear-gradient(135deg, #15803d, #16a34a);
-  border-radius: 12px; padding: 14px 20px; margin-bottom: 14px;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-}
-.quota-filter .qf-label { color: #fff; }
-.quota-filter .qf-label strong { display: block; font-size: 14px; }
-.quota-filter .qf-label span  { font-size: 11px; opacity: .8; }
-.qf-input {
-  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.45);
-  border-radius: 8px; padding: 7px 14px; color: #fff; font-size: 16px;
-  font-weight: 700; width: 90px; text-align: center;
-}
+/* QUOTA FILTER BANNER */
+.quota-filter { background: linear-gradient(135deg, #15803d, #16a34a); border-radius: 12px; padding: 14px 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.qf-label { color: #fff; }
+.qf-label strong { display: block; font-size: 14px; }
+.qf-label span   { font-size: 11px; opacity: .8; }
+.qf-input { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.45); border-radius: 8px; padding: 7px 14px; color: #fff; font-size: 16px; font-weight: 700; width: 90px; text-align: center; }
 .qf-input::placeholder { color: rgba(255,255,255,.5); }
 .qf-input:focus { outline: none; background: rgba(255,255,255,.3); }
 .qf-hint { color: rgba(255,255,255,.75); font-size: 12px; }
 .qf-presets { display: flex; gap: 6px; flex-wrap: wrap; }
-.qf-preset {
-  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
-  border-radius: 6px; padding: 4px 10px; color: #fff; font-size: 12px;
-  font-weight: 600; cursor: pointer; transition: background .15s;
-}
+.qf-preset { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); border-radius: 6px; padding: 4px 10px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
 .qf-preset:hover { background: rgba(255,255,255,.3); }
+.qf-preset.active-preset { background: rgba(255,255,255,.45); border-color: rgba(255,255,255,.8); }
 
-/* MODALS */
-.overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.5);
-  z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px;
-}
+/* MODAL */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .overlay.hidden { display: none; }
-.modal {
-  background: #fff; border-radius: 16px; padding: 24px;
-  width: 100%; max-width: 450px;
-  box-shadow: 0 24px 64px rgba(0,0,0,.22);
-  animation: up .18s ease;
-}
+.modal { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 24px 64px rgba(0,0,0,.22); animation: up .18s ease; }
 @keyframes up { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
 .modal h2 { font-size: 17px; font-weight: 800; }
 .modal .msub { font-size: 13px; color: var(--gray-500); margin: 4px 0 20px; }
-
 .fg { margin-bottom: 14px; }
 .fg label { display: block; font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
-.fg select, .fg input, .fg textarea {
-  width: 100%; border: 1px solid var(--gray-300); border-radius: 8px;
-  padding: 9px 12px; font-size: 14px; color: var(--gray-900); background: var(--gray-50); font-family: inherit;
-}
+.fg select, .fg input, .fg textarea { width: 100%; border: 1px solid var(--gray-300); border-radius: 8px; padding: 9px 12px; font-size: 14px; color: var(--gray-900); background: var(--gray-50); font-family: inherit; }
 .fg textarea { resize: vertical; min-height: 70px; }
 .fg select:focus, .fg input:focus, .fg textarea:focus { outline: none; border-color: var(--brand); background: #fff; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
-/* TEMPLATE PANEL */
-.panel {
-  background: #fff; border-radius: 12px; padding: 16px;
-  margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
+/* PANEL (template) */
+.panel { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 .panel-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .panel-header h3 { font-size: 13px; font-weight: 700; color: var(--gray-700); }
 .panel-body { margin-top: 14px; }
-.panel-body textarea {
-  width: 100%; border: 1px solid var(--gray-300); border-radius: 8px;
-  padding: 10px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 100px;
-}
+.panel-body textarea { width: 100%; border: 1px solid var(--gray-300); border-radius: 8px; padding: 10px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 100px; }
 .panel-body textarea:focus { outline: none; border-color: var(--brand); }
 .hints { font-size: 11px; color: var(--gray-400); margin-top: 6px; line-height: 1.8; }
 .hints code { background: var(--gray-100); padding: 1px 5px; border-radius: 4px; }
 
-/* EMPTY STATE */
+/* EMPTY */
 .empty-state { text-align: center; padding: 64px 24px; color: var(--gray-400); grid-column: 1/-1; }
 .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--gray-500); margin-bottom: 8px; }
-.empty-state p { font-size: 14px; }
 
 /* TOAST */
-.toast {
-  position: fixed; bottom: 20px; right: 20px; z-index: 500;
-  padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
-  background: var(--gray-900); color: #fff;
-  box-shadow: 0 6px 24px rgba(0,0,0,.2); animation: up .18s ease;
-  max-width: 320px;
-}
+.toast { position: fixed; bottom: 20px; right: 20px; z-index: 500; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; background: var(--gray-900); color: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.2); animation: up .18s ease; max-width: 320px; }
 .toast.hidden { display: none; }
 .toast.ok  { background: #166534; }
 .toast.err { background: #991b1b; }
-
-/* UPLOAD AGAIN BUTTON (top bar) */
-.upload-again-btn {
-  display: none;
-}
 
 @media (max-width: 600px) {
   .main { padding: 12px; }
@@ -302,6 +190,7 @@ body {
   .upload-zone { margin: 12px; }
   .cards-grid { grid-template-columns: 1fr; }
   .quota-filter { padding: 12px; }
+  .dash-top { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -316,14 +205,14 @@ body {
     </div>
   </div>
   <div class="header-right">
-    <span class="header-info" id="headerStats"></span>
+    <span class="save-badge" id="saveBadge" style="display:none"></span>
     <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">⬆ Upload Report</button>
     <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
-    <button class="btn btn-ghost" onclick="confirmClear()">🗑</button>
+    <button class="btn btn-ghost" onclick="confirmClear()" title="Clear all data">🗑</button>
   </div>
 </div>
 
-<!-- UPLOAD ZONE (shown when no data) -->
+<!-- UPLOAD ZONE -->
 <div id="uploadZone" class="upload-zone"
   onclick="document.getElementById('fileInput').click()"
   ondragover="event.preventDefault(); this.classList.add('drag-over')"
@@ -333,17 +222,17 @@ body {
   <h3>Upload NOSH7 Subscription Report</h3>
   <p>Drop the daily CSV export here or click to browse</p>
   <p style="margin-top:10px;font-size:12px;color:#94a3b8">
-    Phone number = unique ID &nbsp;·&nbsp; New members are added, existing statuses are preserved
+    Phone = unique ID &nbsp;·&nbsp; New members added, existing statuses preserved &nbsp;·&nbsp; Data saved in browser
   </p>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div class="main" id="mainContent" style="display:none">
 
-  <!-- WHATSAPP TEMPLATE (collapsible) -->
+  <!-- WHATSAPP TEMPLATE -->
   <div class="panel" id="templatePanel">
     <div class="panel-header" onclick="togglePanel()">
-      <h3>💬 WhatsApp Message Template &nbsp;<span id="tplToggleIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
+      <h3>💬 WhatsApp Template &nbsp;<span id="tplToggleIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
       <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveTemplate()">Save</button>
     </div>
     <div class="panel-body" id="templateBody" style="display:none">
@@ -353,18 +242,42 @@ Your NOSH7 subscription ({plan}) has {units} deliveries remaining.
 
 We'd love to keep your healthy meals coming! 🥗
 
-Reply YES to renew, or we can call you to discuss the best plan for you.
+Reply YES to renew, or we can call you to discuss the best plan.
 
 Team NOSH7 🌱
 +91 89051 96948</textarea>
-      <div class="hints">
-        Variables: <code>{name}</code> <code>{phone}</code> <code>{plan}</code>
-        <code>{units}</code> <code>{product}</code> <code>{price}</code> <code>{area}</code> <code>{slot}</code>
+      <div class="hints">Variables: <code>{name}</code> <code>{phone}</code> <code>{plan}</code> <code>{units}</code> <code>{product}</code> <code>{price}</code> <code>{area}</code> <code>{slot}</code></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+    <!-- KPIs -->
+    <div class="dash-top" id="dashKpis"></div>
+    <!-- Batch breakdown -->
+    <div class="dash-section">
+      <div class="dash-section-header" onclick="toggleBatchTable()">
+        📦 Active Customers by Batch / Route
+        <span id="batchToggleHint">▼ expand</span>
+      </div>
+      <div id="batchTableWrap" style="display:none">
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th>Route / Batch</th>
+              <th>Active Customers</th>
+              <th>Pending Deliveries</th>
+              <th>Avg Remaining</th>
+              <th>Breakdown</th>
+            </tr>
+          </thead>
+          <tbody id="batchTableBody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- UNITS FILTER BANNER -->
+  <!-- QUOTA FILTER -->
   <div class="quota-filter">
     <div class="qf-label">
       <strong>Remaining Quota Filter</strong>
@@ -372,10 +285,11 @@ Team NOSH7 🌱
     </div>
     <input class="qf-input" type="number" id="unitsThreshold" placeholder="All" min="0" oninput="renderCards()">
     <div class="qf-presets">
-      <div class="qf-preset" onclick="setThreshold(0)">0 left</div>
-      <div class="qf-preset" onclick="setThreshold(5)">≤5</div>
-      <div class="qf-preset" onclick="setThreshold(10)">≤10</div>
-      <div class="qf-preset" onclick="setThreshold(26)">All</div>
+      <div class="qf-preset" onclick="setThreshold('active')" id="preset-active">🟢 Active (&gt;0)</div>
+      <div class="qf-preset" onclick="setThreshold(0)">🔴 0 left</div>
+      <div class="qf-preset" onclick="setThreshold(5)">≤ 5</div>
+      <div class="qf-preset" onclick="setThreshold(10)">≤ 10</div>
+      <div class="qf-preset" onclick="setThreshold('')">All</div>
     </div>
     <div class="qf-hint" id="qfHint"></div>
   </div>
@@ -438,11 +352,11 @@ Team NOSH7 🌱
   <!-- STATS BAR -->
   <div class="stats-bar" id="statsBar"></div>
 
-  <!-- CARDS GRID -->
+  <!-- CARDS -->
   <div class="cards-grid" id="cardsGrid"></div>
 </div>
 
-<!-- STATUS UPDATE MODAL -->
+<!-- STATUS MODAL -->
 <div class="overlay hidden" id="statusModal">
   <div class="modal">
     <h2>📝 Update Member Status</h2>
@@ -464,7 +378,7 @@ Team NOSH7 🌱
     </div>
     <div class="fg">
       <label>Notes</label>
-      <textarea id="modalNotes" placeholder="What did they say? Any special request?"></textarea>
+      <textarea id="modalNotes" placeholder="What did they say? Any special requests?"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeStatusModal()">Skip for now</button>
@@ -477,15 +391,14 @@ Team NOSH7 🌱
 <div class="toast hidden" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════
-// CONSTANTS & COLUMN MAPPING FOR NOSH7 CSV
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════════
+const STORAGE_KEY  = 'nosh7_members_v1';
+const TEMPLATE_KEY = 'nosh7_wa_template';
+const PENDING_KEY  = 'nosh7_pending_contact';
+const SAVED_TS_KEY = 'nosh7_saved_at';
 
-const STORAGE_KEY   = 'nosh7_members_v1';
-const TEMPLATE_KEY  = 'nosh7_wa_template';
-const PENDING_KEY   = 'nosh7_pending_contact';
-
-// Maps our internal field names → CSV column headers (exact match for NOSH7 export)
 const COL = {
   name:        'Name',
   phone:       'Phone',
@@ -506,19 +419,20 @@ const COL = {
   balance:     'Customer Balance',
 };
 
-// Status values from NOSH7 CSV that count as "live/active"
 const LIVE_RE = /^active$|^live$|^running$/i;
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════
-let members       = [];
+// ════════════════════════════════════════════════
+let members        = [];
 let pendingContact = null;
-let templateOpen  = false;
+let templateOpen   = false;
+let batchOpen      = false;
+let activeOnly     = false; // true = show only remaining > 0
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   members = load();
   loadTemplate();
@@ -529,7 +443,13 @@ window.addEventListener('DOMContentLoaded', () => {
   if (members.length > 0) {
     showMain();
     populateFilterDropdowns();
-    renderCards();
+    renderAll();
+    // Show saved-data toast
+    const ts = localStorage.getItem(SAVED_TS_KEY);
+    if (ts) {
+      const d = new Date(ts);
+      toast(`💾 Restored ${members.length} members (saved ${d.toLocaleDateString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})`, 'ok');
+    }
   }
 
   document.addEventListener('visibilitychange', () => {
@@ -540,15 +460,30 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // STORAGE
-// ═══════════════════════════════════════════════
-function load()  { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
-function save()  { localStorage.setItem(STORAGE_KEY, JSON.stringify(members)); }
+// ════════════════════════════════════════════════
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+  const now = new Date().toISOString();
+  localStorage.setItem(SAVED_TS_KEY, now);
+  updateSaveBadge(now);
+}
+function updateSaveBadge(isoStr) {
+  const badge = document.getElementById('saveBadge');
+  if (!isoStr) { badge.style.display = 'none'; return; }
+  const d = new Date(isoStr);
+  badge.textContent = '💾 Saved ' + d.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  badge.style.display = '';
+}
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // FILE HANDLING
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('uploadZone').classList.remove('drag-over');
@@ -560,23 +495,17 @@ function handleFileUpload(e) {
   if (f) processFile(f);
   e.target.value = '';
 }
-
 function processFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const rows = parseCSV(e.target.result);
       if (rows.length < 2) { toast('CSV is empty or invalid', 'err'); return; }
-      const headers = rows[0].map(h => h.trim());
-      const data    = rows.slice(1).filter(r => r.some(c => c.trim()));
-      importMembers(headers, data);
-    } catch (err) {
-      toast('Error reading file: ' + err.message, 'err');
-    }
+      importMembers(rows[0].map(h => h.trim()), rows.slice(1).filter(r => r.some(c => c.trim())));
+    } catch (err) { toast('Error: ' + err.message, 'err'); }
   };
   reader.readAsText(file);
 }
-
 function parseCSV(text) {
   const rows = [];
   for (const line of text.split(/\r?\n/)) {
@@ -584,9 +513,9 @@ function parseCSV(text) {
     const row = []; let cell = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
-      if (c === '"' && !inQ)               { inQ = true; }
+      if (c === '"' && !inQ) { inQ = true; }
       else if (c === '"' && inQ && line[i+1] === '"') { cell += '"'; i++; }
-      else if (c === '"' && inQ)            { inQ = false; }
+      else if (c === '"' && inQ) { inQ = false; }
       else if ((c === ',' || c === '\t') && !inQ) { row.push(cell.trim()); cell = ''; }
       else { cell += c; }
     }
@@ -596,36 +525,29 @@ function parseCSV(text) {
   return rows;
 }
 
-// ═══════════════════════════════════════════════
-// IMPORT — adds only new members (by phone)
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// IMPORT — only adds new (phone+plan = unique)
+// ════════════════════════════════════════════════
 function importMembers(headers, rows) {
-  const idx = (col) => headers.indexOf(col);
+  const idx = col => headers.indexOf(col);
   const get = (row, col) => { const i = idx(col); return i >= 0 ? (row[i] || '').trim() : ''; };
-
-  // Build existing set: phone_planName → member
   const existingMap = new Map(members.map(m => [m._uid, m]));
-
   let added = 0, skipped = 0;
 
   rows.forEach(row => {
-    const rawPhone = get(row, COL.phone);
-    const phone    = normalPhone(rawPhone);
+    const phone = normalPhone(get(row, COL.phone));
     if (!phone) return;
-
     const planName = get(row, COL.planName);
-    const uid      = phone + '||' + planName;
-
+    const uid = phone + '||' + planName;
     if (existingMap.has(uid)) { skipped++; return; }
 
-    const member = {
-      _uid:        uid,
-      phone,
+    const m = {
+      _uid: uid, phone,
       name:        get(row, COL.name) || 'Unknown',
       product:     get(row, COL.product),
       price:       get(row, COL.price),
       quantity:    get(row, COL.quantity),
-      csvStatus:   get(row, COL.status),         // from CSV, e.g. "Stopped"/"Active"
+      csvStatus:   get(row, COL.status),
       subStart:    get(row, COL.subStart),
       subEnd:      get(row, COL.subEnd),
       lastDelivery:get(row, COL.lastDelivery),
@@ -637,77 +559,153 @@ function importMembers(headers, rows) {
       area:        get(row, COL.area),
       zone:        get(row, COL.zone),
       balance:     get(row, COL.balance),
-
-      // User-managed (never overwritten)
-      status:      'Pending',
-      followUpDate:'',
-      notes:       '',
-      lastContacted: null,
-      lastMethod:    null,
-      addedOn:     todayStr(),
+      // user-managed — never overwritten
+      status: 'Pending', followUpDate: '', notes: '',
+      lastContacted: null, lastMethod: null, addedOn: todayStr(),
     };
-
-    members.push(member);
-    existingMap.set(uid, member);
+    members.push(m);
+    existingMap.set(uid, m);
     added++;
   });
 
   save();
   populateFilterDropdowns();
-  renderCards();
+  renderAll();
   showMain();
-  updateHeader();
-
-  if (added > 0)
-    toast(`✅ ${added} new members added · ${skipped} already in system`, 'ok');
-  else
-    toast(`No new members found · ${skipped} already in system`);
+  toast(added > 0 ? `✅ ${added} new members added · ${skipped} already saved` : `No new members · ${skipped} already in system`, added > 0 ? 'ok' : '');
 }
 
 function normalPhone(p) {
   return (p || '').replace(/\D/g, '').replace(/^91/, '').slice(-10);
 }
 
-// ═══════════════════════════════════════════════
-// SMART FILTER: hide low-price plans when another plan is live
-// Rule: if member has another plan with csvStatus matching LIVE_RE,
-//       hide plans where price < 2 (free/complimentary plans)
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// SMART FILTER (hide free plans when another is live)
+// ════════════════════════════════════════════════
 function applySmartFilter(list) {
   const byPhone = {};
   list.forEach(m => { (byPhone[m.phone] = byPhone[m.phone] || []).push(m); });
-
   const result = [];
   for (const group of Object.values(byPhone)) {
     const hasLive = group.some(m => LIVE_RE.test(m.csvStatus));
     group.forEach(m => {
       const price = parseFloat(m.price) || 0;
-      if (hasLive && price >= 0 && price < 2) return; // skip free plans when another is live
+      if (hasLive && price >= 0 && price < 2) return;
       result.push(m);
     });
   }
   return result;
 }
 
-// ═══════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════
+function renderDashboard() {
+  const smart = applySmartFilter(members);
+
+  // Active = remaining > 0
+  const active = smart.filter(m => (parseFloat(m.remaining) || 0) > 0);
+  const totalPending = smart.reduce((s, m) => s + (parseFloat(m.remaining) || 0), 0);
+  const activeCount  = active.length;
+  const activePending = active.reduce((s, m) => s + (parseFloat(m.remaining) || 0), 0);
+
+  // Status counts
+  const sc = {};
+  members.forEach(m => sc[m.status] = (sc[m.status]||0) + 1);
+
+  document.getElementById('dashKpis').innerHTML = `
+    <div class="dash-kpi green">
+      <div class="kpi-num">${activeCount}</div>
+      <div class="kpi-label">🟢 Active Customers</div>
+    </div>
+    <div class="dash-kpi blue">
+      <div class="kpi-num">${activePending}</div>
+      <div class="kpi-label">📦 Total Pending Deliveries</div>
+    </div>
+    <div class="dash-kpi orange">
+      <div class="kpi-num">${sc['Follow-Up']||0}</div>
+      <div class="kpi-label">🔔 Follow-Up Pending</div>
+    </div>
+    <div class="dash-kpi" style="border-top-color:#7c3aed">
+      <div class="kpi-num" style="color:#7c3aed">${sc['Converted']||0}</div>
+      <div class="kpi-label">✅ Renewed</div>
+    </div>
+    <div class="dash-kpi red">
+      <div class="kpi-num">${smart.filter(m => (parseFloat(m.remaining)||0) === 0).length}</div>
+      <div class="kpi-label">🔴 Zero Remaining</div>
+    </div>
+    <div class="dash-kpi">
+      <div class="kpi-num">${members.length}</div>
+      <div class="kpi-label">👥 Total Members</div>
+    </div>
+  `;
+
+  // Per-route breakdown (active members only)
+  const byRoute = {};
+  active.forEach(m => {
+    const key = m.route || m.area || 'Unknown';
+    if (!byRoute[key]) byRoute[key] = { count: 0, deliveries: 0 };
+    byRoute[key].count++;
+    byRoute[key].deliveries += parseFloat(m.remaining) || 0;
+  });
+
+  const maxCount = Math.max(1, ...Object.values(byRoute).map(r => r.count));
+  const sorted   = Object.entries(byRoute).sort((a, b) => b[1].count - a[1].count);
+
+  document.getElementById('batchTableBody').innerHTML = sorted.length
+    ? sorted.map(([route, d]) => {
+        const avg   = (d.deliveries / d.count).toFixed(1);
+        const barPct = Math.round((d.count / maxCount) * 100);
+        return `<tr>
+          <td>${esc(route)}</td>
+          <td class="td-num">${d.count}</td>
+          <td class="td-num">${d.deliveries}</td>
+          <td class="td-num">${avg}</td>
+          <td><div class="batch-bar-wrap"><div class="batch-bar" style="width:${barPct}%"></div></div></td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:20px">No active customers found</td></tr>`;
+}
+
+function toggleBatchTable() {
+  batchOpen = !batchOpen;
+  document.getElementById('batchTableWrap').style.display = batchOpen ? '' : 'none';
+  document.getElementById('batchToggleHint').textContent = batchOpen ? '▲ collapse' : '▼ expand';
+}
+
+// ════════════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════════════
+function renderAll() {
+  renderDashboard();
+  renderCards();
+  updateHeader();
+}
+
+// ════════════════════════════════════════════════
+// RENDER CARDS
+// ════════════════════════════════════════════════
 function renderCards() {
-  const threshold   = parseFloat(document.getElementById('unitsThreshold').value);
-  const filterStat  = document.getElementById('filterStatus').value;
-  const filterPlan  = document.getElementById('filterPlan').value;
-  const filterArea  = document.getElementById('filterArea').value;
-  const filterFU    = document.getElementById('filterFollowup').value;
-  const search      = (document.getElementById('searchBox').value || '').toLowerCase();
-  const today       = todayStr();
+  const threshold  = document.getElementById('unitsThreshold').value;
+  const filterStat = document.getElementById('filterStatus').value;
+  const filterPlan = document.getElementById('filterPlan').value;
+  const filterArea = document.getElementById('filterArea').value;
+  const filterFU   = document.getElementById('filterFollowup').value;
+  const search     = (document.getElementById('searchBox').value || '').toLowerCase();
+  const ldFrom     = document.getElementById('filterLdFrom').value;
+  const ldTo       = document.getElementById('filterLdTo').value;
+  const today      = todayStr();
 
   let list = applySmartFilter(members);
 
-  // Remaining quota filter (show members with remaining ≤ threshold)
-  if (!isNaN(threshold)) {
+  // Active only (remaining > 0) — triggered by preset
+  if (activeOnly) {
+    list = list.filter(m => (parseFloat(m.remaining) || 0) > 0);
+  } else if (threshold !== '' && !isNaN(parseFloat(threshold))) {
+    const t = parseFloat(threshold);
     list = list.filter(m => {
       const rem = parseFloat(m.remaining);
-      return isNaN(rem) || rem <= threshold;
+      return isNaN(rem) || rem <= t;
     });
   }
 
@@ -718,13 +716,10 @@ function renderCards() {
   if (filterFU === 'overdue')  list = list.filter(m => m.followUpDate && m.followUpDate < today);
   if (filterFU === 'upcoming') list = list.filter(m => m.followUpDate && m.followUpDate > today);
 
-  // Last Delivery Date range filter
-  const ldFrom = document.getElementById('filterLdFrom').value;
-  const ldTo   = document.getElementById('filterLdTo').value;
   if (ldFrom || ldTo) {
     document.getElementById('ldClearBtn').style.display = '';
     list = list.filter(m => {
-      const ld = (m.lastDelivery || '').split(' ')[0]; // take date part only
+      const ld = (m.lastDelivery || '').split(' ')[0];
       if (!ld || ld === '-') return false;
       if (ldFrom && ld < ldFrom) return false;
       if (ldTo   && ld > ldTo)   return false;
@@ -738,23 +733,25 @@ function renderCards() {
     m.name.toLowerCase().includes(search) || m.phone.includes(search)
   );
 
-  // Sort: overdue > today > 0-remaining > low-remaining > name
   list.sort((a, b) => sortScore(a, today) - sortScore(b, today) || a.name.localeCompare(b.name));
 
-  // Stats
+  // Stats bar
   const sc = {};
   members.forEach(m => sc[m.status] = (sc[m.status]||0) + 1);
+  const totalPending = members.reduce((s, m) => s + (parseFloat(m.remaining) || 0), 0);
   document.getElementById('statsBar').innerHTML = `
-    <div class="stat-chip"><span class="num">${members.length}</span>Total</div>
     <div class="stat-chip blue"><span class="num">${list.length}</span>Showing</div>
     <div class="stat-chip"><span class="num">${sc['Pending']||0}</span>Pending</div>
     <div class="stat-chip orange"><span class="num">${sc['Follow-Up']||0}</span>Follow-Up</div>
     <div class="stat-chip green"><span class="num">${sc['Converted']||0}</span>Renewed</div>
     <div class="stat-chip red"><span class="num">${sc['Not Interested']||0}</span>Not Int.</div>
+    <div class="stat-chip purple"><span class="num">${totalPending}</span>Total Pending Deliveries</div>
   `;
 
-  // Hint
-  if (!isNaN(threshold)) {
+  // Quota filter hint
+  if (activeOnly) {
+    document.getElementById('qfHint').textContent = `${list.length} active member${list.length!==1?'s':''} with deliveries remaining`;
+  } else if (threshold !== '' && !isNaN(parseFloat(threshold))) {
     document.getElementById('qfHint').textContent = `${list.length} member${list.length!==1?'s':''} with ≤${threshold} deliveries left`;
   } else {
     document.getElementById('qfHint').textContent = '';
@@ -762,14 +759,14 @@ function renderCards() {
 
   const grid = document.getElementById('cardsGrid');
   if (!list.length) {
-    grid.innerHTML = `<div class="empty-state"><h3>No members match the current filters</h3><p>Try adjusting the filter or quota threshold above</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><h3>No members match the current filters</h3><p>Try adjusting the filters above</p></div>`;
     return;
   }
   grid.innerHTML = list.map(m => buildCard(m, today)).join('');
 }
 
 function sortScore(m, today) {
-  if (m.followUpDate && m.followUpDate < today) return 0; // overdue first
+  if (m.followUpDate && m.followUpDate < today) return 0;
   if (m.followUpDate === today)                  return 1;
   const rem = parseFloat(m.remaining);
   if (!isNaN(rem) && rem === 0) return 2;
@@ -778,284 +775,229 @@ function sortScore(m, today) {
 }
 
 function buildCard(m, today) {
-  const sc = (m.status || 'Pending').toLowerCase().replace(/[\s-]+/g,'');
-  const bc = 'b-' + sc.replace('interested','interested').replace('notinterested','notinterested');
+  const sc  = (m.status || 'Pending').toLowerCase().replace(/[\s-]+/g,'');
   const rem = parseFloat(m.remaining);
 
-  // Quota chip
   let qchip = '';
   if (!isNaN(rem)) {
-    const cls = rem === 0 ? 'quota-zero' : rem <= 5 ? 'quota-low' : 'quota-ok';
+    const cls  = rem === 0 ? 'quota-zero' : rem <= 5 ? 'quota-low' : 'quota-ok';
     const icon = rem === 0 ? '🔴' : rem <= 5 ? '🟠' : '🟢';
     qchip = `<span class="quota-chip ${cls}">${icon} ${rem} deliveries left</span>`;
   }
 
-  // Follow-up pill
   let fupill = '';
   if (m.followUpDate) {
-    if (m.followUpDate < today)       fupill = `<div class="followup-pill fp-overdue">⚠️ Overdue follow-up: ${m.followUpDate}</div>`;
+    if      (m.followUpDate < today)  fupill = `<div class="followup-pill fp-overdue">⚠️ Overdue: ${m.followUpDate}</div>`;
     else if (m.followUpDate === today) fupill = `<div class="followup-pill fp-today">🔔 Follow up TODAY</div>`;
     else                               fupill = `<div class="followup-pill fp-upcoming">📅 Follow-up: ${m.followUpDate}</div>`;
   }
 
-  // Rows
   const rows = [
-    m.product     && ['Product',     m.product],
-    m.planName    && ['Plan',        m.planName],
-    m.price       && ['Price/unit',  '₹' + m.price],
-    m.slot        && ['Slot',        m.slot],
-    m.area        && ['Area',        m.area + (m.zone && m.zone !== m.area ? ' · ' + m.zone : '')],
-    m.lastDelivery&& m.lastDelivery !== '-' && ['Last Delivery', m.lastDelivery.split(' ')[0]],
+    m.product      && ['Product',      m.product],
+    m.planName     && ['Plan',         m.planName],
+    m.price        && ['Price/unit',   '₹' + m.price],
+    m.slot         && ['Slot',         m.slot],
+    m.area         && ['Area',         m.area + (m.zone && m.zone !== m.area ? ' · ' + m.zone : '')],
+    m.lastDelivery && m.lastDelivery !== '-' && ['Last Delivery', m.lastDelivery.split(' ')[0]],
     m.balance && parseFloat(m.balance) != 0 && ['Balance', '₹' + m.balance],
   ].filter(Boolean);
 
-  const rowHtml = rows.map(([k,v]) =>
-    `<div class="card-row"><span class="lbl">${k}</span><span class="val">${esc(v)}</span></div>`
-  ).join('');
-
+  const rowHtml   = rows.map(([k,v]) => `<div class="card-row"><span class="lbl">${k}</span><span class="val">${esc(v)}</span></div>`).join('');
   const notesHtml = m.notes ? `<div class="notes-row">💬 ${esc(m.notes.substring(0,80))}${m.notes.length>80?'…':''}</div>` : '';
 
-  const waMsg = buildWAMsg(m);
-  const waUrl = `https://wa.me/91${m.phone}?text=${encodeURIComponent(waMsg)}`;
-  const telUrl = `tel:+91${m.phone}`;
   const safeUid = m._uid.replace(/[^a-z0-9]/gi, '_');
+  const waMsg   = buildWAMsg(m);
+  const waUrl   = `https://wa.me/91${m.phone}?text=${encodeURIComponent(waMsg)}`;
 
   return `
 <div class="card s-${sc}" id="c_${safeUid}">
   <div class="card-header">
     <div>
       <div class="card-name">${esc(m.name)}</div>
-      <div class="card-mobile">📱 ${m.phone}${m.lastContacted ? ' · Last: ' + fmtDate(m.lastContacted) : ''}</div>
+      <div class="card-mobile">📱 ${m.phone}${m.lastContacted ? ' · ' + fmtDate(m.lastContacted) : ''}</div>
     </div>
-    <span class="status-badge ${bc}">${m.status}</span>
+    <span class="status-badge b-${sc}">${m.status}</span>
   </div>
   <div class="card-body">
-    ${rowHtml}
-    ${qchip}
-    ${fupill}
-    ${notesHtml}
+    ${rowHtml}${qchip}${fupill}${notesHtml}
   </div>
   <div class="card-footer">
-    <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-wa"
-       onclick="onWA('${safeUid}')">💬 WhatsApp</a>
-    <a href="${telUrl}" class="btn btn-call"
-       onclick="onCall('${safeUid}')">📞 Call</a>
-    <button class="btn btn-outline btn-sm" style="margin-left:auto"
-      onclick="openModal('${safeUid}', null)">✏️ Update</button>
+    <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-wa" onclick="onWA('${safeUid}')">💬 WhatsApp</a>
+    <a href="tel:+91${m.phone}" class="btn btn-call" onclick="onCall('${safeUid}')">📞 Call</a>
+    <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openModal('${safeUid}',null)">✏️ Update</button>
   </div>
 </div>`;
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // CONTACT HANDLERS
-// ═══════════════════════════════════════════════
-function findBySafeUid(safeUid) {
-  // reverse the safeUid to original uid
-  return members.find(m => m._uid.replace(/[^a-z0-9]/gi,'_') === safeUid);
-}
+// ════════════════════════════════════════════════
+function findBySafeUid(s) { return members.find(m => m._uid.replace(/[^a-z0-9]/gi,'_') === s); }
 
 function onWA(safeUid) {
-  const m = findBySafeUid(safeUid);
-  if (!m) return;
-  m.lastContacted = new Date().toISOString();
-  m.lastMethod = 'WhatsApp';
+  const m = findBySafeUid(safeUid); if (!m) return;
+  m.lastContacted = new Date().toISOString(); m.lastMethod = 'WhatsApp';
   save();
   pendingContact = { safeUid, method: 'WhatsApp' };
   localStorage.setItem(PENDING_KEY, JSON.stringify(pendingContact));
 }
-
 function onCall(safeUid) {
-  const m = findBySafeUid(safeUid);
-  if (!m) return;
-  m.lastContacted = new Date().toISOString();
-  m.lastMethod = 'Call';
+  const m = findBySafeUid(safeUid); if (!m) return;
+  m.lastContacted = new Date().toISOString(); m.lastMethod = 'Call';
   save();
   pendingContact = { safeUid, method: 'Call' };
   localStorage.setItem(PENDING_KEY, JSON.stringify(pendingContact));
-  setTimeout(triggerModal, 1200); // show update modal after call initiated
+  setTimeout(triggerModal, 1200);
 }
-
 function triggerModal() {
   if (!pendingContact) return;
   const m = findBySafeUid(pendingContact.safeUid);
   if (!m) { clearPending(); return; }
   openModal(pendingContact.safeUid, pendingContact.method);
 }
+function clearPending() { pendingContact = null; localStorage.removeItem(PENDING_KEY); }
 
-function clearPending() {
-  pendingContact = null;
-  localStorage.removeItem(PENDING_KEY);
-}
-
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // STATUS MODAL
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 let _modalUid = null;
 
 function openModal(safeUid, method) {
   _modalUid = safeUid;
-  const m = findBySafeUid(safeUid);
-  if (!m) return;
-
+  const m = findBySafeUid(safeUid); if (!m) return;
   document.getElementById('statusModalSub').textContent =
-    method
-      ? `You ${method === 'WhatsApp' ? 'messaged' : 'called'} ${m.name} — what was the outcome?`
-      : `Update status for ${m.name} (${m.phone})`;
-
+    method ? `You ${method === 'WhatsApp' ? 'messaged' : 'called'} ${m.name} — what was the outcome?`
+           : `Update status for ${m.name} (${m.phone})`;
   document.getElementById('modalStatus').value = m.status === 'Pending' ? 'Contacted' : m.status;
   document.getElementById('modalFollowupDate').value = m.followUpDate || '';
   document.getElementById('modalNotes').value = m.notes || '';
-
   document.getElementById('statusModal').classList.remove('hidden');
 }
-
 function closeStatusModal() {
   document.getElementById('statusModal').classList.add('hidden');
-  clearPending();
-  _modalUid = null;
+  clearPending(); _modalUid = null;
 }
-
 function saveStatus() {
   if (!_modalUid) return;
-  const m = findBySafeUid(_modalUid);
-  if (!m) return;
-
-  const rawStatus = document.getElementById('modalStatus').value;
-  m.status       = rawStatus.split(' — ')[0]; // strip hint text
+  const m = findBySafeUid(_modalUid); if (!m) return;
+  m.status       = document.getElementById('modalStatus').value.split(' — ')[0];
   m.followUpDate = document.getElementById('modalFollowupDate').value;
   m.notes        = document.getElementById('modalNotes').value;
-
-  save();
-  closeStatusModal();
-  renderCards();
-  toast('Status updated ✅', 'ok');
+  save(); closeStatusModal(); renderAll(); toast('Status updated ✅', 'ok');
 }
+document.getElementById('statusModal').addEventListener('click', function(e) { if (e.target === this) closeStatusModal(); });
 
-document.getElementById('statusModal').addEventListener('click', function(e) {
-  if (e.target === this) closeStatusModal();
-});
-
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // WHATSAPP TEMPLATE
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 function loadTemplate() {
-  const saved = localStorage.getItem(TEMPLATE_KEY);
-  if (saved) document.getElementById('waTemplate').value = saved;
+  const s = localStorage.getItem(TEMPLATE_KEY);
+  if (s) document.getElementById('waTemplate').value = s;
 }
 function saveTemplate() {
   localStorage.setItem(TEMPLATE_KEY, document.getElementById('waTemplate').value);
   toast('Template saved ✅', 'ok');
 }
-
 function buildWAMsg(m) {
-  const tpl = document.getElementById('waTemplate').value || 'Hello {name}!';
-  return tpl
-    .replace(/{name}/g,    m.name        || '')
-    .replace(/{phone}/g,   m.phone       || '')
-    .replace(/{plan}/g,    m.planName    || '')
-    .replace(/{units}/g,   m.remaining   || '0')
-    .replace(/{product}/g, m.product     || '')
+  return (document.getElementById('waTemplate').value || 'Hello {name}!')
+    .replace(/{name}/g,    m.name     || '')
+    .replace(/{phone}/g,   m.phone    || '')
+    .replace(/{plan}/g,    m.planName || '')
+    .replace(/{units}/g,   m.remaining|| '0')
+    .replace(/{product}/g, m.product  || '')
     .replace(/{price}/g,   m.price ? '₹'+m.price : '')
-    .replace(/{area}/g,    m.area        || '')
-    .replace(/{slot}/g,    m.slot        || '');
+    .replace(/{area}/g,    m.area     || '')
+    .replace(/{slot}/g,    m.slot     || '');
 }
-
 function togglePanel() {
   templateOpen = !templateOpen;
   document.getElementById('templateBody').style.display = templateOpen ? '' : 'none';
-  document.getElementById('tplToggleIcon').textContent = templateOpen ? '▲ collapse' : '▼ expand';
+  document.getElementById('tplToggleIcon').textContent  = templateOpen ? '▲ collapse' : '▼ expand';
 }
 
-// ═══════════════════════════════════════════════
-// FILTER DROPDOWNS (plan, area)
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// FILTER HELPERS
+// ════════════════════════════════════════════════
 function populateFilterDropdowns() {
   const plans = [...new Set(members.map(m => m.planName).filter(Boolean))].sort();
   const areas = [...new Set(members.map(m => m.area || m.route).filter(Boolean))].sort();
 
-  const planSel = document.getElementById('filterPlan');
-  const current = planSel.value;
-  planSel.innerHTML = '<option value="">All Plans</option>' +
-    plans.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
-  if (current) planSel.value = current;
+  const ps = document.getElementById('filterPlan'); const pc = ps.value;
+  ps.innerHTML = '<option value="">All Plans</option>' + plans.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  if (pc) ps.value = pc;
 
-  const areaSel = document.getElementById('filterArea');
-  const curA = areaSel.value;
-  areaSel.innerHTML = '<option value="">All Areas</option>' +
-    areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
-  if (curA) areaSel.value = curA;
+  const as = document.getElementById('filterArea'); const ac = as.value;
+  as.innerHTML = '<option value="">All Areas</option>' + areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  if (ac) as.value = ac;
 }
 
 function setThreshold(v) {
-  document.getElementById('unitsThreshold').value = v === 26 ? '' : v;
+  activeOnly = (v === 'active');
+  // Toggle preset highlight
+  document.querySelectorAll('.qf-preset').forEach(el => el.classList.remove('active-preset'));
+  if (activeOnly) document.getElementById('preset-active').classList.add('active-preset');
+
+  if (v === 'active' || v === '') {
+    document.getElementById('unitsThreshold').value = '';
+  } else {
+    document.getElementById('unitsThreshold').value = v;
+  }
   renderCards();
 }
 
-// ═══════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════
 function clearLdFilter() {
   document.getElementById('filterLdFrom').value = '';
   document.getElementById('filterLdTo').value   = '';
   renderCards();
 }
 
+// ════════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════════
 function exportCSV() {
   if (!members.length) { toast('No data to export', 'err'); return; }
   const cols = ['name','phone','planName','product','price','remaining','planQuota','csvStatus',
-                'area','slot','status','followUpDate','notes','lastContacted','lastMethod','addedOn'];
-  const hdr  = cols.join(',');
-  const rows = members.map(m =>
-    cols.map(c => `"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')
+                'area','route','slot','status','followUpDate','notes','lastContacted','lastMethod','addedOn'];
+  const blob = new Blob(
+    [cols.join(',') + '\n' + members.map(m => cols.map(c => `"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')],
+    { type: 'text/csv' }
   );
-  const blob = new Blob([hdr+'\n'+rows.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `nosh7_outreach_${todayStr()}.csv`;
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `nosh7_outreach_${todayStr()}.csv`; a.click();
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // HELPERS
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 function showMain() {
   document.getElementById('uploadZone').style.display = 'none';
   document.getElementById('mainContent').style.display = '';
+  const ts = localStorage.getItem(SAVED_TS_KEY);
+  updateSaveBadge(ts);
   updateHeader();
 }
-
 function updateHeader() {
-  const smartFiltered = applySmartFilter(members);
-  document.getElementById('headerSub').textContent =
-    `${members.length} members · ${smartFiltered.length} showing after smart filter`;
-  document.getElementById('headerStats').textContent =
-    `📅 ${todayStr()}`;
+  const smart = applySmartFilter(members);
+  const active = smart.filter(m => (parseFloat(m.remaining)||0) > 0).length;
+  document.getElementById('headerSub').textContent = `${members.length} members · ${active} active`;
 }
-
 function confirmClear() {
-  if (!confirm('Delete ALL member data? This cannot be undone.\n\nYour outreach history and statuses will be lost.')) return;
-  members = [];
-  save();
+  if (!confirm('Delete ALL member data?\n\nThis will remove all members, statuses and outreach history.')) return;
+  members = []; save();
   document.getElementById('uploadZone').style.display = '';
   document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('headerSub').textContent = 'Upload today\'s report to begin';
-  document.getElementById('headerStats').textContent = '';
+  document.getElementById('headerSub').textContent = "Upload today's report to begin";
+  document.getElementById('saveBadge').style.display = 'none';
   toast('All data cleared', 'err');
 }
 
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-IN', {day:'2-digit',month:'short'}) : ''; }
-function esc(s) {
-  return (s||'').toString()
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function toast(msg, type = '') {
+function todayStr()  { return new Date().toISOString().split('T')[0]; }
+function fmtDate(iso){ return iso ? new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : ''; }
+function esc(s)      { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = 'toast hidden'; }, 3800);
+  t.textContent = msg; t.className = 'toast ' + type;
+  clearTimeout(t._t); t._t = setTimeout(() => { t.className = 'toast hidden'; }, 3800);
 }
 </script>
 </body>
