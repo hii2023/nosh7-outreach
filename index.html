@@ -67,13 +67,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .dash-kpi.orange { border-top-color:var(--orange); }
 .dash-kpi.red    { border-top-color:var(--red); }
 .dash-kpi.purple { border-top-color:#7c3aed; }
+.dash-kpi.amber  { border-top-color:#f59e0b; }
 .kpi-num   { font-size:26px; font-weight:900; line-height:1; }
 .dash-kpi.green  .kpi-num { color:var(--brand); }
 .dash-kpi.blue   .kpi-num { color:var(--blue); }
 .dash-kpi.orange .kpi-num { color:var(--orange); }
 .dash-kpi.red    .kpi-num { color:var(--red); }
 .dash-kpi.purple .kpi-num { color:#7c3aed; }
+.dash-kpi.amber  .kpi-num { color:#d97706; }
 .kpi-label { font-size:11px; font-weight:600; color:var(--gray-500); margin-top:4px; }
+
+/* MEMBER CHECKBOX */
+.member-cb { width:15px; height:15px; cursor:pointer; accent-color:var(--brand); flex-shrink:0; margin-top:3px; }
+
+/* BULK ACTION BAR */
+#bulkBar { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:#0f172a; color:#fff; padding:11px 18px; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.35); z-index:300; align-items:center; gap:12px; white-space:nowrap; font-size:13px; font-weight:600; }
 
 .dash-section { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.07); overflow:hidden; margin-bottom:14px; }
 .dash-section-hdr { padding:11px 16px; font-size:13px; font-weight:700; color:var(--gray-700); background:var(--gray-50); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
@@ -199,7 +207,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   </div>
   <div class="header-right">
     <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
-    <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">⬆ Upload</button>
+    <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆ Add New</button>
+    <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄 Refresh</button>
     <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
     <button class="btn btn-ghost" onclick="confirmClear()" title="Clear data">🗑</button>
   </div>
@@ -311,6 +320,10 @@ Team NOSH7 🌱
       <label>Search</label>
       <input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:130px">
     </div>
+    <div class="tg">
+      <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll()" title="Select / deselect all visible" style="width:15px;height:15px;cursor:pointer;accent-color:var(--brand)">
+      <label for="selectAllCb" style="cursor:pointer;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">Select All</label>
+    </div>
     <div class="tg" style="margin-left:auto;gap:6px">
       <select id="fPlan" onchange="renderCards()" title="Filter by Plan"><option value="">All Plans</option></select>
       <select id="fArea" onchange="renderCards()" title="Filter by Area"><option value="">All Areas</option></select>
@@ -330,6 +343,13 @@ Team NOSH7 🌱
 
   <!-- CARDS -->
   <div class="cards-grid" id="cardsGrid"></div>
+</div>
+
+<!-- BULK ACTION BAR -->
+<div id="bulkBar" style="display:none">
+  <span id="bulkCount">0 selected</span>
+  <button onclick="bulkWhatsApp()" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">💬 WhatsApp All</button>
+  <button onclick="clearSelection()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer">✕ Clear</button>
 </div>
 
 <!-- STATUS MODAL -->
@@ -387,13 +407,16 @@ const LIVE_RE = /^active$|^live$|^running$/i;
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let members        = [];
-let pendingContact = null;
-let tplOpen        = false;
-let batchOpen      = false;
-let activeFilter   = 'all';
-let activeDashKpi  = null;  // which dashboard KPI tile is highlighted
-let _pushing       = false; // prevent re-entrant pushes
+let members           = [];
+let pendingContact    = null;
+let tplOpen           = false;
+let batchOpen         = false;
+let activeFilter      = 'all';
+let activeDashKpi     = null;
+let selectedMembers   = new Set(); // sids of checked cards
+let uploadMode        = 'add';     // 'add' | 'refresh'
+let _lastFilteredList = [];        // current visible list for select-all
+let _pushing          = false;
 
 // ═══════════════════════════════════════════
 // INIT
@@ -550,9 +573,32 @@ function parseCSV(text) {
 function importMembers(headers, rows) {
   const idx=col=>headers.indexOf(col);
   const get=(row,col)=>{const i=idx(col);return i>=0?(row[i]||'').trim():'';};
+  const isRefresh = uploadMode==='refresh';
+  uploadMode = 'add'; // reset for next upload
+
+  if(isRefresh) {
+    const byUid=new Map(members.map(m=>[m._uid,m]));
+    let updated=0;
+    rows.forEach(row=>{
+      const phone=normalPhone(get(row,COL.phone)); if(!phone) return;
+      const uid=phone+'||'+get(row,COL.planName);
+      const m=byUid.get(uid); if(!m) return;
+      m.remaining   =get(row,COL.remaining);
+      m.planQuota   =get(row,COL.planQuota);
+      m.csvStatus   =get(row,COL.status);
+      m.lastDelivery=get(row,COL.lastDelivery);
+      m.balance     =get(row,COL.balance);
+      m.subEnd      =get(row,COL.subEnd);
+      m._modifiedAt =new Date().toISOString();
+      updated++;
+    });
+    save(); populateDropdowns(); renderAll(); showMain();
+    toast(`🔄 ${updated} members refreshed with latest quota data`, 'ok');
+    return;
+  }
+
   const existing=new Map(members.map(m=>[m._uid,m]));
   let added=0,skipped=0;
-
   rows.forEach(row=>{
     const phone=normalPhone(get(row,COL.phone)); if(!phone) return;
     const plan=get(row,COL.planName);
@@ -572,7 +618,6 @@ function importMembers(headers, rows) {
     };
     members.push(m); existing.set(uid,m); added++;
   });
-
   save(); populateDropdowns(); renderAll(); showMain();
   toast(added>0?`✅ ${added} new members added · ${skipped} already saved`:`No new members · ${skipped} already saved`, added>0?'ok':'');
 }
@@ -642,20 +687,33 @@ function toggleQuotaFilter(){
 // ═══════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════
+function parseDate(s) {
+  if(!s||s==='-'||s==='') return null;
+  let d=new Date(s);
+  if(!isNaN(d.getTime())) return d;
+  const m=s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if(m){d=new Date(`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);if(!isNaN(d.getTime())) return d;}
+  return null;
+}
+
 function renderDashboard() {
   const list=smartFilter(members);
   const active=list.filter(m=>(parseFloat(m.remaining)||0)>0);
   const totalPending=active.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
   const sc={};
   members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
-
   const zeroCount=list.filter(m=>(parseFloat(m.remaining)||0)===0).length;
+  const todayD=new Date(); todayD.setHours(0,0,0,0);
+  const in7=new Date(todayD); in7.setDate(in7.getDate()+7);
+  const expiringCount=list.filter(m=>{const d=parseDate(m.subEnd);return d&&d>=todayD&&d<=in7;}).length;
+
   document.getElementById('dashKpis').innerHTML=`
     <div class="dash-kpi green clickable${activeDashKpi==='active'?' active-kpi':''}" onclick="dashFilterBy('quota','active')"><div class="kpi-num">${active.length}</div><div class="kpi-label">🟢 Active Customers</div></div>
     <div class="dash-kpi blue"><div class="kpi-num">${totalPending}</div><div class="kpi-label">📦 Pending Deliveries</div></div>
     <div class="dash-kpi orange clickable${activeDashKpi==='followup'?' active-kpi':''}" onclick="dashFilterBy('status','Follow-Up')"><div class="kpi-num">${sc['Follow-Up']||0}</div><div class="kpi-label">🔔 Follow-Up</div></div>
     <div class="dash-kpi purple clickable${activeDashKpi==='converted'?' active-kpi':''}" onclick="dashFilterBy('status','Converted')"><div class="kpi-num">${sc['Converted']||0}</div><div class="kpi-label">✅ Renewed</div></div>
     <div class="dash-kpi red clickable${activeDashKpi==='zero'?' active-kpi':''}" onclick="dashFilterBy('quota','zero')"><div class="kpi-num">${zeroCount}</div><div class="kpi-label">🔴 Zero Remaining</div></div>
+    <div class="dash-kpi amber clickable${activeDashKpi==='expiring'?' active-kpi':''}" onclick="dashFilterBy('expiring','expiring')"><div class="kpi-num">${expiringCount}</div><div class="kpi-label">⏳ Expiring in 7d</div></div>
     <div class="dash-kpi clickable${activeDashKpi==='all'?' active-kpi':''}" onclick="dashFilterBy('all','all')"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
   `;
 
@@ -692,6 +750,9 @@ function dashFilterBy(type, kpiId) {
   } else if(type === 'status') {
     activeFilter = 'all';
     document.getElementById('fStatus').value = kpiId;
+  } else if(type === 'expiring') {
+    activeFilter = 'expiring';
+    document.getElementById('fStatus').value = '';
   } else {
     activeFilter = 'all';
     document.getElementById('fStatus').value = '';
@@ -736,7 +797,8 @@ function renderCards() {
 
   let list=smartFilter(members);
 
-  if(activeFilter==='active')         list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r>0;});
+  if(activeFilter==='active')          list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r>0;});
+  else if(activeFilter==='expiring')   {const td=new Date();td.setHours(0,0,0,0);const i7=new Date(td);i7.setDate(i7.getDate()+7);list=list.filter(m=>{const d=parseDate(m.subEnd);return d&&d>=td&&d<=i7;});}
   else if(activeFilter!=='all')        list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r===activeFilter;});
 
   if(fStat) list=list.filter(m=>m.status===fStat);
@@ -764,13 +826,20 @@ function renderCards() {
   const sb=document.getElementById('showingBar');
   if(sb) sb.textContent=list.length===total?`Showing all ${list.length} members`:`Showing ${list.length} of ${total} members`;
 
-  if(activeFilter==='all')         document.getElementById('qbHint').textContent='';
-  else if(activeFilter==='active') document.getElementById('qbHint').textContent=`${list.length} active members with deliveries remaining`;
-  else                             document.getElementById('qbHint').textContent=`${list.length} members with exactly ${activeFilter} deliveries left`;
+  if(activeFilter==='all')            document.getElementById('qbHint').textContent='';
+  else if(activeFilter==='active')    document.getElementById('qbHint').textContent=`${list.length} active members with deliveries remaining`;
+  else if(activeFilter==='expiring')  document.getElementById('qbHint').textContent=`${list.length} members expiring within 7 days`;
+  else                                document.getElementById('qbHint').textContent=`${list.length} members with exactly ${activeFilter} deliveries left`;
+
+  _lastFilteredList = list;
+  const allSids=list.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
+  const saEl=document.getElementById('selectAllCb');
+  if(saEl){saEl.checked=allSids.length>0&&allSids.every(s=>selectedMembers.has(s));saEl.indeterminate=!saEl.checked&&allSids.some(s=>selectedMembers.has(s));}
 
   const grid=document.getElementById('cardsGrid');
-  if(!list.length){grid.innerHTML=`<div class="empty-state"><h3>No members match</h3><p>Try a different filter</p></div>`;return;}
+  if(!list.length){grid.innerHTML=`<div class="empty-state"><h3>No members match</h3><p>Try a different filter</p></div>`;renderBulkBar();return;}
   grid.innerHTML=list.map(m=>buildCard(m,today)).join('');
+  renderBulkBar();
 }
 
 function sortScore(m,today){
@@ -806,7 +875,8 @@ function buildCard(m,today){
   return `
 <div class="card s-${sc}">
   <div class="card-hdr">
-    <div><div class="card-name">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
+    <input type="checkbox" id="cb_${sid}" class="member-cb" ${selectedMembers.has(sid)?'checked':''} onclick="event.stopPropagation();toggleSelect('${sid}')">
+    <div style="flex:1"><div class="card-name">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
     <span class="sbadge b-${sc}">${m.status}</span>
   </div>
   <div class="card-body">
@@ -906,6 +976,46 @@ function exportCSV(){
   const blob=new Blob([cols.join(',')+'\n'+members.map(m=>cols.map(c=>`"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nosh7_outreach_${todayStr()}.csv`;a.click();
 }
+
+// ═══════════════════════════════════════════
+// BULK SELECTION & WHATSAPP
+// ═══════════════════════════════════════════
+function toggleSelect(sid) {
+  if(selectedMembers.has(sid)) selectedMembers.delete(sid);
+  else selectedMembers.add(sid);
+  const cb=document.getElementById('cb_'+sid);
+  if(cb) cb.checked=selectedMembers.has(sid);
+  const allSids=_lastFilteredList.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
+  const saEl=document.getElementById('selectAllCb');
+  if(saEl){saEl.checked=allSids.length>0&&allSids.every(s=>selectedMembers.has(s));saEl.indeterminate=!saEl.checked&&allSids.some(s=>selectedMembers.has(s));}
+  renderBulkBar();
+}
+function toggleSelectAll() {
+  const allSids=_lastFilteredList.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
+  const allSelected=allSids.every(s=>selectedMembers.has(s));
+  if(allSelected) allSids.forEach(s=>selectedMembers.delete(s));
+  else allSids.forEach(s=>selectedMembers.add(s));
+  renderCards();
+}
+function renderBulkBar() {
+  const bar=document.getElementById('bulkBar');
+  if(!bar) return;
+  if(selectedMembers.size===0){bar.style.display='none';return;}
+  bar.style.display='flex';
+  const el=document.getElementById('bulkCount');
+  if(el) el.textContent=selectedMembers.size+' selected';
+}
+function bulkWhatsApp() {
+  const toContact=_lastFilteredList.filter(m=>selectedMembers.has(m._uid.replace(/[^a-z0-9]/gi,'_')));
+  if(!toContact.length){toast('No selected members in current view','err');return;}
+  toContact.forEach((m,i)=>{
+    setTimeout(()=>{
+      window.open(`https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}`,'_blank');
+    },i*700);
+  });
+  toast(`Opening WhatsApp for ${toContact.length} members…`,'ok');
+}
+function clearSelection(){selectedMembers.clear();renderCards();}
 
 function todayStr() {return new Date().toISOString().split('T')[0];}
 function fmtDate(iso){return iso?new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):''}
