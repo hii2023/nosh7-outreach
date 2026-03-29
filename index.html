@@ -1,1030 +1,737 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOSH7 — Member Outreach Manager</title>
-<!-- Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<style>
-* { box-sizing:border-box; margin:0; padding:0; }
-:root {
-  --green:#25D366; --green-dark:#128C7E;
-  --blue:#2563eb;  --blue-dark:#1d4ed8;
-  --orange:#f97316; --red:#ef4444;
-  --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
-  --gray-300:#cbd5e1; --gray-400:#94a3b8; --gray-500:#64748b;
-  --gray-700:#334155; --gray-900:#0f172a;
-  --brand:#16a34a; --brand-dark:#15803d;
-}
-body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--gray-100); color:var(--gray-900); min-height:100vh; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* HEADER */
-.header { background:var(--brand); color:#fff; padding:11px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.15); gap:8px; }
-.header-logo h1 { font-size:17px; font-weight:800; }
-.header-logo .sub { font-size:11px; opacity:.8; margin-top:1px; }
-.header-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0a2342 0%, #0e4d6e 40%, #0d7d9e 75%, #1ab3cc 100%);
+            background-attachment: fixed;
+            color: #fff;
+        }
 
-/* SYNC INDICATOR */
-.sync-dot {
-  display:inline-flex; align-items:center; gap:5px;
-  font-size:11px; font-weight:600;
-  background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
-  border-radius:20px; padding:3px 10px; white-space:nowrap;
-}
-.sync-dot .dot { width:7px; height:7px; border-radius:50%; background:#86efac; flex-shrink:0; }
-.sync-dot.syncing .dot { background:#fcd34d; animation:pulse .8s ease infinite; }
-.sync-dot.offline .dot { background:#fca5a5; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+        .hero-title {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .hero-title span {
+            background: linear-gradient(90deg, #7df9ff, #a8edff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            color: rgba(255,255,255,0.6);
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .stat-pill {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .stat-pill strong { color: #fff; }
 
-/* BUTTONS */
-.btn { display:inline-flex; align-items:center; gap:5px; padding:8px 13px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; text-decoration:none; white-space:nowrap; }
-.btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { background:var(--blue-dark); }
-.btn-wa   { background:var(--green); color:#fff; font-size:12px; padding:7px 10px; } .btn-wa:hover   { background:var(--green-dark); }
-.btn-call { background:var(--blue);  color:#fff; font-size:12px; padding:7px 10px; } .btn-call:hover { background:var(--blue-dark); }
-.btn-outline { background:#fff; color:var(--gray-700); border:1px solid var(--gray-300); } .btn-outline:hover { background:var(--gray-50); }
-.btn-sm { padding:5px 10px; font-size:12px; border-radius:6px; }
-.btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-size:12px; padding:6px 11px; } .btn-ghost:hover { background:rgba(255,255,255,.15); }
+        /* ── CONTROLS ── */
+        .controls {
+            max-width: 680px;
+            margin: 1.75rem auto 0;
+            padding: 0 1.5rem;
+        }
+        .search-wrap { position: relative; }
+        .search-wrap input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .search-wrap input::placeholder { color: rgba(255,255,255,0.4); }
+        .search-wrap input:focus {
+            border-color: rgba(125,249,255,0.6);
+            background: rgba(255,255,255,0.15);
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
 
-/* UPLOAD ZONE */
-.upload-zone { border:2px dashed var(--gray-300); border-radius:14px; padding:48px 20px; text-align:center; background:#fff; cursor:pointer; transition:all .2s; margin:20px; }
-.upload-zone:hover,.upload-zone.drag-over { border-color:var(--brand); background:#f0fdf4; }
-.upload-icon { font-size:44px; margin-bottom:12px; }
-.upload-zone h3 { font-size:16px; font-weight:700; color:var(--gray-700); margin-bottom:6px; }
-.upload-zone p  { font-size:13px; color:var(--gray-500); line-height:1.6; }
+        /* ── GROUP FILTERS ── */
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.9rem;
+            justify-content: center;
+        }
+        .filter-btn {
+            padding: 0.38rem 1rem;
+            border-radius: 30px;
+            border: 1.5px solid rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .filter-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+        .filter-btn.active {
+            background: rgba(125,249,255,0.22);
+            border-color: #7df9ff;
+            color: #7df9ff;
+        }
 
-/* MAIN */
-.main { padding:16px 20px; }
+        /* ── GRID ── */
+        .container {
+            max-width: 1160px;
+            margin: 2rem auto 4rem;
+            padding: 0 1.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.4rem;
+        }
 
-/* DASHBOARD */
-.dash-top { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:12px; }
-.dash-kpi { background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.07); border-top:3px solid var(--gray-200); }
-.dash-kpi.clickable { cursor:pointer; transition:transform .15s,box-shadow .15s; }
-.dash-kpi.clickable:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
-.dash-kpi.clickable.active-kpi { outline:2px solid var(--brand); outline-offset:2px; }
-.dash-kpi.green  { border-top-color:var(--brand); }
-.dash-kpi.blue   { border-top-color:var(--blue); }
-.dash-kpi.orange { border-top-color:var(--orange); }
-.dash-kpi.red    { border-top-color:var(--red); }
-.dash-kpi.purple { border-top-color:#7c3aed; }
-.dash-kpi.amber  { border-top-color:#f59e0b; }
-.kpi-num   { font-size:26px; font-weight:900; line-height:1; }
-.dash-kpi.green  .kpi-num { color:var(--brand); }
-.dash-kpi.blue   .kpi-num { color:var(--blue); }
-.dash-kpi.orange .kpi-num { color:var(--orange); }
-.dash-kpi.red    .kpi-num { color:var(--red); }
-.dash-kpi.purple .kpi-num { color:#7c3aed; }
-.dash-kpi.amber  .kpi-num { color:#d97706; }
-.kpi-label { font-size:11px; font-weight:600; color:var(--gray-500); margin-top:4px; }
+        /* ── GROUP LABEL ── */
+        .group-label {
+            grid-column: 1 / -1;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            margin-top: 0.75rem;
+        }
 
-/* MEMBER CHECKBOX */
-.member-cb { width:15px; height:15px; cursor:pointer; accent-color:var(--brand); flex-shrink:0; margin-top:3px; }
+        /* ── CARD ── */
+        .card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #1a1a2e;
+            transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
+        }
+        .card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 18px 48px rgba(0,0,0,0.28);
+        }
 
-/* BULK ACTION BAR */
-#bulkBar { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:#0f172a; color:#fff; padding:11px 18px; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.35); z-index:300; align-items:center; gap:12px; white-space:nowrap; font-size:13px; font-weight:600; }
+        /* Banner */
+        .card-banner {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            line-height: 1;
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .badge {
+            position: absolute;
+            top: 9px; right: 10px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.18rem 0.55rem;
+            border-radius: 20px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .badge-live { background: rgba(255,255,255,0.28); color: #fff; }
+        .badge-github { background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.85); }
 
-.dash-section { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.07); overflow:hidden; margin-bottom:14px; }
-.dash-section-hdr { padding:11px 16px; font-size:13px; font-weight:700; color:var(--gray-700); background:var(--gray-50); border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
-.batch-table { width:100%; border-collapse:collapse; }
-.batch-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-400); padding:8px 14px; text-align:left; border-bottom:1px solid var(--gray-100); }
-.batch-table td { padding:9px 14px; font-size:13px; border-bottom:1px solid var(--gray-100); }
-.batch-table tr:last-child td { border-bottom:none; }
-.batch-table tr:hover td { background:var(--gray-50); }
-.td-name { font-weight:600; }
-.td-num  { font-weight:700; }
-.bar-wrap { width:100px; height:6px; background:var(--gray-100); border-radius:3px; overflow:hidden; }
-.bar-fill { height:100%; border-radius:3px; background:var(--brand); }
+        /* Body */
+        .card-body {
+            padding: 1rem 1.1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .card-name {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.35rem;
+            word-break: break-word;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .card-name:hover { color: #0077b6; }
 
-/* QUOTA FILTER */
-.quota-banner { background:linear-gradient(135deg,#15803d,#16a34a); border-radius:12px; padding:14px 16px; margin-bottom:14px; }
-.qb-label strong { color:#fff; display:block; font-size:14px; }
-.qb-label span   { color:rgba(255,255,255,.8); font-size:11px; }
-.qb-hint { color:rgba(255,255,255,.75); font-size:12px; margin-top:6px; }
-.quota-chips { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
-.qchip { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:20px; padding:5px 12px; color:#fff; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; }
-.qchip:hover { background:rgba(255,255,255,.28); }
-.qchip.active { background:rgba(255,255,255,.5); border-color:#fff; color:#166534; }
+        .card-url {
+            font-size: 0.68rem;
+            color: #9ca3af;
+            margin-bottom: 0.55rem;
+            word-break: break-all;
+            text-decoration: none;
+        }
+        .card-url:hover { color: #0077b6; text-decoration: underline; }
 
-/* TOOLBAR */
-.toolbar { background:#fff; border-radius:12px; padding:11px 14px; display:flex; flex-wrap:wrap; gap:9px; align-items:center; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
-.tg { display:flex; align-items:center; gap:6px; }
-.tg label { font-size:10px; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:.4px; }
-.tg select,.tg input { border:1px solid var(--gray-300); border-radius:7px; padding:6px 9px; font-size:13px; color:var(--gray-700); background:var(--gray-50); }
-.tg select:focus,.tg input:focus { outline:none; border-color:var(--brand); }
+        .card-desc {
+            font-size: 0.83rem;
+            color: #6b7280;
+            line-height: 1.55;
+            flex-grow: 1;
+            margin-bottom: 0.85rem;
+        }
+        .card-desc.empty { font-style: italic; color: #c0c4cc; }
 
-/* STATS BAR */
-.stats-bar { display:flex; gap:9px; flex-wrap:wrap; margin-bottom:12px; }
-.sc { background:#fff; border-radius:10px; padding:9px 14px; font-size:11px; font-weight:600; color:var(--gray-500); box-shadow:0 1px 3px rgba(0,0,0,.06); min-width:70px; }
-.sc .n { font-size:20px; font-weight:800; display:block; color:var(--gray-900); line-height:1.1; }
-.sc.blue .n   { color:var(--blue); }
-.sc.green .n  { color:var(--brand); }
-.sc.orange .n { color:var(--orange); }
-.sc.red .n    { color:var(--red); }
-.sc.purple .n { color:#7c3aed; }
+        /* ── SUB-PAGES SECTION ── */
+        .subpages {
+            margin-bottom: 0.85rem;
+        }
+        .subpages-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 0.45rem;
+        }
+        .subpages-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        /* Clickable chip — real pages & anchors */
+        a.chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 0.28rem 0.65rem;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+        a.chip.page {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+        a.chip.page:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+        a.chip.anchor {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        a.chip.anchor:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+        /* Non-clickable chip — SPA tabs */
+        span.chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 0.28rem 0.65rem;
+            border-radius: 20px;
+            background: #f3f4f6;
+            color: #9ca3af;
+            border: 1px solid #e5e7eb;
+            cursor: default;
+        }
 
-/* CARDS */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:12px; }
-.card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; border-left:4px solid var(--gray-300); transition:box-shadow .18s,transform .18s; }
-.card:hover { box-shadow:0 6px 18px rgba(0,0,0,.1); transform:translateY(-1px); }
-.card.s-pending       { border-left-color:#fbbf24; }
-.card.s-contacted     { border-left-color:var(--blue); }
-.card.s-interested    { border-left-color:#8b5cf6; }
-.card.s-followup      { border-left-color:var(--orange); }
-.card.s-converted     { border-left-color:var(--brand); }
-.card.s-notinterested { border-left-color:var(--red); }
-.card-hdr { padding:12px 14px 8px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.card-name { font-size:14px; font-weight:700; }
-.card-mob  { font-size:11px; color:var(--gray-400); margin-top:1px; }
-.sbadge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-.b-pending       { background:#fef9c3; color:#854d0e; }
-.b-contacted     { background:#dbeafe; color:#1e40af; }
-.b-interested    { background:#ede9fe; color:#5b21b6; }
-.b-followup      { background:#ffedd5; color:#9a3412; }
-.b-converted     { background:#dcfce7; color:#166534; }
-.b-notinterested { background:#fee2e2; color:#991b1b; }
-.card-body { padding:2px 14px 10px; }
-.cr { display:flex; justify-content:space-between; font-size:12px; padding:2.5px 0; border-bottom:1px solid var(--gray-100); }
-.cr:last-child { border-bottom:none; }
-.cr .lbl { color:var(--gray-400); font-weight:500; }
-.cr .val { font-weight:600; text-align:right; max-width:60%; word-break:break-word; }
-.qchip-card { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:7px; }
-.qc-zero { background:#fee2e2; color:#991b1b; }
-.qc-low  { background:#ffedd5; color:#9a3412; }
-.qc-ok   { background:#dcfce7; color:#166534; }
-.fupill { margin-top:7px; padding:5px 9px; border-radius:7px; font-size:11px; font-weight:600; }
-.fp-overdue  { background:#fee2e2; color:#991b1b; }
-.fp-today    { background:#fef9c3; color:#854d0e; }
-.fp-upcoming { background:#f0fdf4; color:#166634; }
-.notes-row { margin-top:7px; font-size:11px; color:var(--gray-500); background:var(--gray-50); border-radius:6px; padding:5px 8px; font-style:italic; }
-.card-footer { padding:9px 13px; border-top:1px solid var(--gray-100); display:flex; gap:7px; align-items:center; }
+        /* ── CARD FOOTER ── */
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding-top: 0.65rem;
+            border-top: 1px solid #f3f4f6;
+        }
+        .updated { font-size: 0.68rem; color: #c0c4cc; }
+        .open-btn {
+            font-size: 0.73rem;
+            font-weight: 600;
+            padding: 0.36rem 0.85rem;
+            border-radius: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: opacity 0.15s;
+        }
+        .open-btn:hover { opacity: 0.82; }
+        .btn-live   { background: #0077b6; color: #fff; }
+        .btn-github { background: #1f2937; color: #fff; }
 
-/* TEMPLATE PANEL */
-.panel { background:#fff; border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
-.panel-hdr { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.panel-hdr h3 { font-size:13px; font-weight:700; color:var(--gray-700); }
-.panel-body { margin-top:12px; }
-.panel-body textarea { width:100%; border:1px solid var(--gray-300); border-radius:8px; padding:10px; font-size:13px; font-family:inherit; resize:vertical; min-height:90px; }
-.panel-body textarea:focus { outline:none; border-color:var(--brand); }
-.hints { font-size:11px; color:var(--gray-400); margin-top:6px; line-height:1.8; }
-.hints code { background:var(--gray-100); padding:1px 5px; border-radius:4px; }
+        /* ── STATES ── */
+        .state-box {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: rgba(255,255,255,0.55);
+            grid-column: 1/-1;
+        }
+        .spinner {
+            display: inline-block;
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #7df9ff;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin-bottom: 0.75rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255,255,255,0.45);
+            font-size: 0.9rem;
+            display: none;
+        }
 
-/* MODALS */
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,.52); z-index:200; display:flex; align-items:center; justify-content:center; padding:14px; }
-.overlay.hidden { display:none; }
-.modal { background:#fff; border-radius:16px; padding:22px; width:100%; max-width:460px; box-shadow:0 24px 64px rgba(0,0,0,.22); animation:slideUp .18s ease; }
-@keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:none;opacity:1} }
-.modal h2 { font-size:17px; font-weight:800; }
-.modal .msub { font-size:13px; color:var(--gray-500); margin:4px 0 18px; }
-.fg { margin-bottom:13px; }
-.fg label { display:block; font-size:11px; font-weight:700; color:var(--gray-700); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px; }
-.fg select,.fg input,.fg textarea { width:100%; border:1px solid var(--gray-300); border-radius:8px; padding:9px 11px; font-size:14px; color:var(--gray-900); background:var(--gray-50); font-family:inherit; }
-.fg textarea { resize:vertical; min-height:65px; }
-.fg select:focus,.fg input:focus,.fg textarea:focus { outline:none; border-color:var(--brand); background:#fff; }
-.modal-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:18px; }
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+        }
+        footer a { color: rgba(255,255,255,0.38); text-decoration: none; }
+        footer a:hover { color: rgba(255,255,255,0.65); }
 
-/* EMPTY / TOAST */
-.empty-state { text-align:center; padding:60px 20px; color:var(--gray-400); grid-column:1/-1; }
-.empty-state h3 { font-size:17px; font-weight:700; color:var(--gray-500); margin-bottom:8px; }
-.toast { position:fixed; bottom:18px; right:18px; z-index:500; padding:11px 18px; border-radius:10px; font-size:13px; font-weight:600; background:var(--gray-900); color:#fff; box-shadow:0 6px 24px rgba(0,0,0,.2); animation:slideUp .18s ease; max-width:300px; }
-.toast.hidden { display:none; }
-.toast.ok  { background:#166534; }
-.toast.err { background:#991b1b; }
-
-@media (max-width:600px) {
-  .main{padding:12px;} .header{padding:10px 14px;}
-  .upload-zone{margin:12px;} .cards-grid{grid-template-columns:1fr;}
-  .dash-top{grid-template-columns:repeat(2,1fr);}
-}
-</style>
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-logo">
-    <h1>🥗 NOSH7 Outreach</h1>
-    <div class="sub" id="headerSub">Connecting…</div>
-  </div>
-  <div class="header-right">
-    <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
-    <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆ Add New</button>
-    <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄 Refresh</button>
-    <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
-    <button class="btn btn-ghost" onclick="confirmClear()" title="Clear data">🗑</button>
-  </div>
+<div class="hero">
+    <h1 class="hero-title">Things I've <span>Built</span> 🚀</h1>
+    <p class="hero-sub">Live from GitHub · Updates automatically on every visit</p>
+    <div class="stats-row" id="stats"></div>
 </div>
 
-<!-- UPLOAD ZONE -->
-<div id="uploadZone" class="upload-zone"
-  onclick="document.getElementById('fileInput').click()"
-  ondragover="event.preventDefault();this.classList.add('drag-over')"
-  ondragleave="this.classList.remove('drag-over')"
-  ondrop="handleDrop(event)">
-  <div class="upload-icon">📂</div>
-  <h3>Upload NOSH7 Subscription Report</h3>
-  <p>Drop the daily CSV here or click to browse</p>
-  <p style="margin-top:10px;font-size:12px;color:#94a3b8">
-    Data syncs automatically across all your devices in real time 🔄
-  </p>
+<div class="controls">
+    <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="search" type="text" placeholder="Search projects…" oninput="applyFilters()" />
+    </div>
+    <div class="filters">
+        <button class="filter-btn active" onclick="setGroup('all',this)">All</button>
+        <button class="filter-btn" onclick="setGroup('nosh7',this)">🍱 Nosh7</button>
+        <button class="filter-btn" onclick="setGroup('websites',this)">🌐 Websites</button>
+        <button class="filter-btn" onclick="setGroup('tools',this)">🔧 Tools</button>
+    </div>
 </div>
 
-<!-- MAIN -->
-<div class="main" id="mainContent" style="display:none">
-
-  <!-- TEMPLATE -->
-  <div class="panel">
-    <div class="panel-hdr" onclick="togglePanel()">
-      <h3>💬 WhatsApp Template &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
-      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveTemplate()">Save</button>
+<div class="container">
+    <div id="repos-grid" class="grid">
+        <div class="state-box">
+            <div class="spinner"></div><br>Loading your projects…
+        </div>
     </div>
-    <div class="panel-body" id="tplBody" style="display:none">
-      <textarea id="waTemplate">Hello {name}! 👋
-
-Your NOSH7 subscription ({plan}) has {units} deliveries remaining.
-
-We'd love to keep your healthy meals coming! 🥗
-
-Reply YES to renew, or we can call you to discuss the best plan.
-
-Team NOSH7 🌱
-+91 89051 96948</textarea>
-      <div class="hints">Variables: <code>{name}</code> <code>{phone}</code> <code>{plan}</code> <code>{units}</code> <code>{product}</code> <code>{price}</code> <code>{area}</code> <code>{slot}</code></div>
-    </div>
-  </div>
-
-  <!-- ═══ DASHBOARD ═══ -->
-  <div class="dash-section" style="margin-bottom:14px">
-    <div class="dash-section-hdr" style="cursor:default;justify-content:flex-start;gap:10px">
-      📊 Dashboard
-      <span style="font-weight:400;font-size:11px;color:var(--gray-400)">Click any number to filter members below</span>
-    </div>
-
-    <!-- KPI GRID -->
-    <div id="dashKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--gray-100)"></div>
-
-    <!-- BATCH TABLE -->
-    <div style="border-top:1px solid var(--gray-200)">
-      <div class="dash-section-hdr" onclick="toggleBatch()" style="border-top:none">
-        📦 Active by Batch / Route
-        <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
-      </div>
-      <div id="batchBody" style="display:none">
-        <table class="batch-table">
-          <thead><tr><th>Route / Batch</th><th>Active</th><th>Pending Deliveries</th><th>Avg Left</th><th>Share</th></tr></thead>
-          <tbody id="batchRows"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- DELIVERY FILTER (hidden by default) -->
-    <div style="border-top:1px solid var(--gray-200);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-outline btn-sm" onclick="toggleQuotaFilter()" id="quotaToggleBtn"
-        style="border-color:var(--brand);color:var(--brand);font-size:12px">▼ Show Delivery Count Filter</button>
-      <span id="qbHint" style="font-size:12px;color:var(--gray-500);font-weight:500"></span>
-    </div>
-    <div id="quotaBanner" style="display:none;padding:12px 14px;background:linear-gradient(135deg,#15803d,#16a34a);border-radius:0 0 12px 12px">
-      <div style="color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px">Click a count to show matching members</div>
-      <div class="quota-chips" id="quotaChips"></div>
-    </div>
-  </div>
-
-  <!-- ═══ QUICK FILTER BAR (always visible) ═══ -->
-  <div class="toolbar" style="position:sticky;top:54px;z-index:90;border-radius:0;margin:0 -20px 14px;padding:10px 20px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-    <div class="tg">
-      <label>🔴 0 Left</label>
-      <button id="zeroDelivBtn" onclick="setFilter(0)"
-        style="font-weight:700;border:1.5px solid #fca5a5;color:#991b1b;background:#fff1f2;border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer;white-space:nowrap">
-        <span id="zeroDelivCount">0</span> members
-      </button>
-    </div>
-    <div class="tg">
-      <label>Status</label>
-      <select id="fStatus" onchange="resetDashKpi();renderCards()">
-        <option value="">All</option>
-        <option>Pending</option><option>Contacted</option><option>Interested</option>
-        <option>Follow-Up</option><option>Converted</option><option>Not Interested</option>
-      </select>
-    </div>
-    <div class="tg">
-      <label>Last Delivery From</label>
-      <input type="date" id="fLdFrom" onchange="renderCards()">
-    </div>
-    <div class="tg">
-      <label>To</label>
-      <input type="date" id="fLdTo" onchange="renderCards()">
-    </div>
-    <div class="tg" id="ldClear" style="display:none">
-      <button class="btn btn-outline btn-sm" onclick="clearDates()">✕ Dates</button>
-    </div>
-    <div class="tg">
-      <label>Search</label>
-      <input type="text" id="fSearch" placeholder="Name / phone…" oninput="renderCards()" style="min-width:130px">
-    </div>
-    <div class="tg">
-      <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll()" title="Select / deselect all visible" style="width:15px;height:15px;cursor:pointer;accent-color:var(--brand)">
-      <label for="selectAllCb" style="cursor:pointer;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px">Select All</label>
-    </div>
-    <div class="tg" style="margin-left:auto;gap:6px">
-      <select id="fPlan" onchange="renderCards()" title="Filter by Plan"><option value="">All Plans</option></select>
-      <select id="fArea" onchange="renderCards()" title="Filter by Area"><option value="">All Areas</option></select>
-      <select id="fFollowup" onchange="renderCards()" title="Follow-Up filter">
-        <option value="">Follow-Up: All</option>
-        <option value="overdue">⚠ Overdue</option>
-        <option value="today">🔔 Today</option>
-        <option value="upcoming">📅 Upcoming</option>
-      </select>
-      <button class="btn btn-outline btn-sm" onclick="resetAllFilters()">✕ Reset</button>
-      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export</button>
-    </div>
-  </div>
-
-  <!-- SHOWING COUNT -->
-  <div id="showingBar" style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px;padding:0 2px"></div>
-
-  <!-- CARDS -->
-  <div class="cards-grid" id="cardsGrid"></div>
+    <div id="no-results" class="no-results">No projects match your search.</div>
 </div>
 
-<!-- BULK ACTION BAR -->
-<div id="bulkBar" style="display:none">
-  <span id="bulkCount">0 selected</span>
-  <button onclick="bulkWhatsApp()" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">💬 WhatsApp All</button>
-  <button onclick="clearSelection()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer">✕ Clear</button>
-</div>
-
-<!-- STATUS MODAL -->
-<div class="overlay hidden" id="statusModal">
-  <div class="modal">
-    <h2>📝 Update Status</h2>
-    <div class="msub" id="statusSub">Update the outcome of your contact</div>
-    <div class="fg"><label>Outcome</label>
-      <select id="mStatus">
-        <option value="Contacted">Contacted</option>
-        <option value="Interested">Interested — wants to renew</option>
-        <option value="Follow-Up">Follow-Up needed</option>
-        <option value="Converted">Converted — renewed ✅</option>
-        <option value="Not Interested">Not Interested</option>
-        <option value="Pending">Pending (reset)</option>
-      </select>
-    </div>
-    <div class="fg"><label>Follow-Up Date</label><input type="date" id="mDate"></div>
-    <div class="fg"><label>Notes</label><textarea id="mNotes" placeholder="What did they say?"></textarea></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeStatus()">Skip</button>
-      <button class="btn btn-primary" onclick="saveStatus()">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast hidden" id="toast"></div>
+<footer>
+    ✦ Auto-updated live from GitHub ·
+    <a href="https://github.com/hii2023" target="_blank">github.com/hii2023</a>
+</footer>
 
 <script>
-// ═══════════════════════════════════════════
-// SUPABASE CONFIG
-// ═══════════════════════════════════════════
-const SB_URL  = 'https://sqosmiifjqecidxhyjtg.supabase.co';
-const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb3NtaWlmanFlY2lkeGh5anRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDczNzQsImV4cCI6MjA4ODM4MzM3NH0.xAVThNZNjRbZ5ObA721XZLexUiRUIVSXx0UZNs0ZwTI';
-const SESSION = 'nosh7_altaf'; // unique key for this user's data
+const USERNAME = 'hii2023';
 
-const sb = supabase.createClient(SB_URL, SB_KEY);
-
-// ═══════════════════════════════════════════
-// LOCAL CACHE KEYS
-// ═══════════════════════════════════════════
-const SK  = 'nosh7_members_v1';
-const TK  = 'nosh7_wa_template';
-const PK  = 'nosh7_pending';
-
-const COL = {
-  name:'Name', phone:'Phone', product:'Product', price:'Price per unit',
-  quantity:'Quantity', status:'Status', subStart:'Subscription start date',
-  subEnd:'Subscription end date', lastDelivery:'Last Delivery date',
-  slot:'Delivery Slot', planName:'Plan Name', planQuota:'Plan quota',
-  remaining:'Remaining quota', route:'Route', area:'Area', zone:'Zone', balance:'Customer Balance',
+/* ── STATIC SITE DATA ──────────────────────────────────────────
+   Live URLs + sub-pages collected by crawling each site.
+   New repos auto-appear from GitHub API; add their sub-pages here.
+──────────────────────────────────────────────────────────────── */
+const SITE_DATA = {
+    'item': {
+        liveUrl: 'https://hii2023.github.io/item',
+        title:   'NOSH7 Juice Launch Tracker',
+        subpages: [
+            { label: 'Menu & Pricing',      url: null,  type: 'tab' },
+            { label: 'Launch Checklist',    url: null,  type: 'tab' },
+            { label: 'Competitors Insights',url: null,  type: 'tab' },
+        ]
+    },
+    'BusinessFirst': {
+        liveUrl: 'https://hii2023.github.io/BusinessFirst',
+        title:   'Business First — Digital Business',
+        subpages: [
+            { label: 'Services',     url: 'https://hii2023.github.io/BusinessFirst#services',     type: 'anchor' },
+            { label: 'Pricing',      url: 'https://hii2023.github.io/BusinessFirst#pricing',      type: 'anchor' },
+            { label: 'Testimonials', url: 'https://hii2023.github.io/BusinessFirst#testimonials', type: 'anchor' },
+            { label: 'Contact',      url: 'https://hii2023.github.io/BusinessFirst#contact',      type: 'anchor' },
+        ]
+    },
+    'leaqualify': {
+        liveUrl: 'https://hii2023.github.io/leaqualify',
+        title:   'NOSH7 Lead Qualifier Tool',
+        subpages: [
+            { label: '🎯 Qualify',    url: null, type: 'tab' },
+            { label: '💬 DM Script',  url: null, type: 'tab' },
+            { label: '🚩 Red Flags',  url: null, type: 'tab' },
+        ]
+    },
+    'nosh7-outreach': {
+        liveUrl: 'https://hii2023.github.io/nosh7-outreach/',
+        title:   'NOSH7 Member Outreach Manager',
+        subpages: []
+    },
+    'SAPNA': {
+        liveUrl: 'https://hii2023.github.io/SAPNA',
+        title:   "Sapna's Art Studio",
+        subpages: []
+    },
+    'growth-hub': {
+        liveUrl: 'https://hii2023.github.io/growth-hub',
+        title:   'The Growth Hub — Master Learning Center',
+        subpages: [
+            { label: '🤝 Negotiation Lab', url: 'https://hii2023.github.io/growth-hub/negotiations/index.html', type: 'page' },
+            { label: '💰 Sales Vault',     url: 'https://hii2023.github.io/growth-hub/sales/index.html',       type: 'page' },
+            { label: '☮️ Harmony Center',  url: 'https://hii2023.github.io/growth-hub/conflict/index.html',    type: 'page' },
+            { label: '🧠 Mind Reader',     url: 'https://hii2023.github.io/growth-hub/psychology/index.html',  type: 'page' },
+            { label: '🤖 AI & Future Biz', url: 'https://hii2023.github.io/growth-hub/ai-trends/index.html',  type: 'page' },
+        ]
+    },
+    'invitation': {
+        liveUrl: 'https://heenaazaz.in/',
+        title:   'Daawat — Heena & Azaz Wedding Invite',
+        subpages: []
+    },
+    'nosh7-whatsapp-crm': {
+        liveUrl: 'https://hii2023.github.io/nosh7-whatsapp-crm',
+        title:   'Nosh7 Fresh Salad Subscriptions, Mumbai',
+        subpages: [
+            { label: 'Plans',        url: 'https://hii2023.github.io/nosh7-whatsapp-crm#plans',   type: 'anchor' },
+            { label: 'How It Works', url: 'https://hii2023.github.io/nosh7-whatsapp-crm#how',     type: 'anchor' },
+            { label: 'Menu',         url: 'https://hii2023.github.io/nosh7-whatsapp-crm#menu',    type: 'anchor' },
+            { label: 'Reviews',      url: 'https://hii2023.github.io/nosh7-whatsapp-crm#reviews', type: 'anchor' },
+            { label: 'FAQ',          url: 'https://hii2023.github.io/nosh7-whatsapp-crm#faq',     type: 'anchor' },
+        ]
+    },
+    'landing-page-nosh7': {
+        liveUrl: 'https://partners.nosh7.in/',
+        title:   'Nosh7 — Partner With Us',
+        subpages: [
+            { label: 'Benefits',      url: 'https://partners.nosh7.in/#benefits',      type: 'anchor' },
+            { label: 'How It Works',  url: 'https://partners.nosh7.in/#how-it-works',  type: 'anchor' },
+            { label: 'Custom Plans',  url: 'https://partners.nosh7.in/#custom-plans',  type: 'anchor' },
+            { label: 'Testimonials',  url: 'https://partners.nosh7.in/#testimonials',  type: 'anchor' },
+            { label: 'Partner Form',  url: 'https://partners.nosh7.in/#partner-form',  type: 'anchor' },
+        ]
+    },
+    'nosh7-crm': {
+        liveUrl: 'https://hii2023.github.io/nosh7-crm',
+        title:   'NOSH7 CRM Dashboard',
+        subpages: [
+            { label: '📊 Dashboard',  url: null, type: 'tab' },
+            { label: '👥 Leads',      url: null, type: 'tab' },
+            { label: '💬 Templates',  url: null, type: 'tab' },
+            { label: '🗂️ Categories', url: null, type: 'tab' },
+            { label: '📈 Analytics',  url: null, type: 'tab' },
+        ]
+    },
+    'nosh7-in': {
+        liveUrl: 'https://nosh7.in/',
+        title:   'NOSH7 — Fresh Salad Delivery Ahmedabad',
+        subpages: [
+            { label: 'Subscriptions', url: 'https://nosh7.in/subscription.html', type: 'page' },
+            { label: 'Health Blog',   url: 'https://nosh7.in/blog.html',         type: 'page' },
+            { label: 'Ahmedabad',     url: 'https://nosh7.in/ahmedabad.html',    type: 'page' },
+            { label: '📋 Menu',       url: 'https://nosh7.in/assets/nosh7-menu.jpg', type: 'page' },
+        ]
+    },
+    'Test-Writing-Tool': {
+        liveUrl: 'https://hii2023.github.io/Test-Writing-Tool',
+        title:   'NOSH7 Sales Engine',
+        subpages: []
+    },
+    'nosh7in': {
+        liveUrl: 'https://hii2023.github.io/nosh7in',
+        title:   'NOSH7 Ahmedabad — Salad Subscription',
+        subpages: [
+            { label: 'Subscriptions', url: 'https://hii2023.github.io/nosh7in/subscription.html', type: 'page' },
+            { label: 'Health Blog',   url: 'https://hii2023.github.io/nosh7in/blog.html',         type: 'page' },
+            { label: 'Ahmedabad',     url: 'https://hii2023.github.io/nosh7in/ahmedabad.html',    type: 'page' },
+        ]
+    },
 };
-const LIVE_RE = /^active$|^live$|^running$/i;
 
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let members           = [];
-let pendingContact    = null;
-let tplOpen           = false;
-let batchOpen         = false;
-let activeFilter      = 'all';
-let activeDashKpi     = null;
-let selectedMembers   = new Set(); // sids of checked cards
-let uploadMode        = 'add';     // 'add' | 'refresh'
-let _lastFilteredList = [];        // current visible list for select-all
-let _pushing          = false;
+/* ── BANNER COLOURS (ocean palette) ── */
+const BANNERS = [
+    'linear-gradient(135deg,#0077b6,#00b4d8)',
+    'linear-gradient(135deg,#023e8a,#0096c7)',
+    'linear-gradient(135deg,#0089a7,#48cae4)',
+    'linear-gradient(135deg,#005f73,#0a9396)',
+    'linear-gradient(135deg,#03045e,#0077b6)',
+    'linear-gradient(135deg,#0582ca,#06d6a0)',
+    'linear-gradient(135deg,#00b4d8,#90e0ef)',
+    'linear-gradient(135deg,#1d3557,#457b9d)',
+];
 
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', async () => {
-  // 1. Load from local cache immediately (instant UI)
-  members = loadLocal();
-  loadTemplate();
-  try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
-
-  if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
-
-  setSyncStatus('syncing', 'Syncing…');
-
-  // 2. Pull latest from cloud and merge
-  try {
-    const { data, error } = await sb.from('nosh7_sessions').select('members').eq('id', SESSION).maybeSingle();
-    if (!error && data?.members?.length) {
-      members = mergeMembers(members, data.members);
-      saveLocal();
-      if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
-    }
-    setSyncStatus('live', 'Live');
-  } catch(e) {
-    setSyncStatus('offline', 'Offline');
-  }
-
-  // 3. Subscribe to realtime changes
-  subscribeRealtime();
-
-  // 4. Visibility / focus events for pending contact
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && pendingContact) setTimeout(triggerModal,400); });
-  window.addEventListener('focus', () => { if (pendingContact) setTimeout(triggerModal,400); });
-});
-
-// ═══════════════════════════════════════════
-// SYNC STATUS INDICATOR
-// ═══════════════════════════════════════════
-function setSyncStatus(state, label) {
-  const dot   = document.getElementById('syncDot');
-  const lbl   = document.getElementById('syncLabel');
-  dot.className = 'sync-dot ' + (state === 'live' ? '' : state);
-  lbl.textContent = label;
+/* ── ICONS ── */
+const ICON_MAP = [
+    ['whatsapp','💬'],['crm','📊'],['nosh7','🍱'],['food','🍽️'],
+    ['landing','🌐'],['outreach','📣'],['growth','📈'],['lead','🎯'],
+    ['invitation','💌'],['invite','💌'],['business','💼'],
+    ['item','📦'],['test','🧪'],['tool','🔧'],['sapna','✨'],
+];
+function getIcon(name) {
+    const l = name.toLowerCase();
+    for (const [k,i] of ICON_MAP) if (l.includes(k)) return i;
+    return '📁';
 }
 
-// ═══════════════════════════════════════════
-// REALTIME SUBSCRIPTION
-// ═══════════════════════════════════════════
-function subscribeRealtime() {
-  sb.channel('nosh7_rt')
-    .on('postgres_changes', {
-      event: '*', schema: 'public', table: 'nosh7_sessions',
-      filter: `id=eq.${SESSION}`
-    }, payload => {
-      if (_pushing) return; // ignore echo of our own push
-      const remote = payload.new?.members;
-      if (!Array.isArray(remote)) return;
-      members = mergeMembers(members, remote);
-      saveLocal();
-      populateDropdowns();
-      renderAll();
-      setSyncStatus('live', 'Live');
-      toast('🔄 Synced from another device', 'ok');
-    })
-    .subscribe(status => {
-      if (status === 'SUBSCRIBED')    setSyncStatus('live',    'Live');
-      if (status === 'CLOSED')        setSyncStatus('offline', 'Offline');
-      if (status === 'CHANNEL_ERROR') setSyncStatus('offline', 'Offline');
+/* ── DESCRIPTIONS ── */
+const SMART_DESC = {
+    'nosh7-whatsapp-crm':  'WhatsApp CRM system for Nosh7 subscription management',
+    'nosh7-crm':           'Customer relationship management dashboard for Nosh7',
+    'nosh7-outreach':      'Outreach and marketing automation tool for Nosh7',
+    'landing-page-nosh7':  'Partner landing page for Nosh7 nutritionists & dietitians',
+    'nosh7-in':            'Nosh7 main website — fresh salad delivery, Ahmedabad',
+    'nosh7in':             'Nosh7 Ahmedabad — salad subscription & health blog',
+    'growth-hub':          '5-track learning hub — sales, negotiation, AI & more',
+    'invitation':          'Digital wedding invitation — Heena & Azaz',
+    'leaqualify':          'Lead qualification & scoring tool for Nosh7 sales',
+    'BusinessFirst':       'Digital business starter page with services & pricing',
+    'item':                'NOSH7 Juice Launch Tracker — pricing & launch checklist',
+    'Test-Writing-Tool':   'Sales message generator for WhatsApp, email & calls',
+    'SAPNA':               "Sapna's Art Studio — handcrafted with love",
+};
+function getDesc(repo) {
+    if (repo.description) return { text: repo.description, empty: false };
+    const s = SMART_DESC[repo.name];
+    return s ? { text: s, empty: false } : { text: 'No description yet.', empty: true };
+}
+
+/* ── GROUP LOGIC ── */
+const GROUP_ORDER  = ['nosh7','websites','tools','other'];
+const GROUP_LABELS = {
+    nosh7:    '🍱  Nosh7 Projects',
+    websites: '🌐  Websites',
+    tools:    '🔧  Tools & Apps',
+    other:    '📁  Other',
+};
+function getGroup(name) {
+    const l = name.toLowerCase();
+    if (l.includes('nosh7') || l.includes('nosh'))                             return 'nosh7';
+    if (['sapna','test-writing-tool','growth-hub','leaqualify'].includes(l))   return 'tools';
+    if (['item','businessfirst','invitation'].includes(l))                      return 'websites';
+    return 'other';
+}
+
+/* ── TIME ── */
+function timeAgo(d) {
+    const s = Math.floor((Date.now() - new Date(d)) / 1000);
+    if (s < 60)      return 'just now';
+    if (s < 3600)    return `${Math.floor(s/60)}m ago`;
+    if (s < 86400)   return `${Math.floor(s/3600)}h ago`;
+    if (s < 2592000) return `${Math.floor(s/86400)}d ago`;
+    return new Date(d).toLocaleDateString('en-IN',{month:'short',year:'numeric'});
+}
+
+/* ── BUILD CARD HTML ── */
+function buildCard(repo, idx) {
+    const data     = SITE_DATA[repo.name] || {};
+    const liveUrl  = data.liveUrl || null;
+    const mainUrl  = liveUrl || repo.html_url;
+    const isLive   = !!liveUrl;
+    const subpages = data.subpages || [];
+    const desc     = getDesc(repo);
+    const icon     = getIcon(repo.name);
+    const banner   = BANNERS[idx % BANNERS.length];
+    const displayUrl = liveUrl
+        ? liveUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
+        : repo.html_url.replace('https://github.com/', 'github.com/');
+
+    /* Sub-page chips */
+    let subHtml = '';
+    if (subpages.length) {
+        const typeLabel = subpages[0].type === 'page'   ? 'Sub-pages'
+                        : subpages[0].type === 'anchor' ? 'Sections'
+                        : 'App views';
+        const chips = subpages.map(sp => {
+            if (sp.type === 'tab' || !sp.url) {
+                return `<span class="chip" title="In-app view (no direct link)">${sp.label}</span>`;
+            }
+            const cls = sp.type === 'page' ? 'page' : 'anchor';
+            const icon = sp.type === 'page' ? '↗' : '#';
+            return `<a class="chip ${cls}" href="${sp.url}" target="_blank" onclick="event.stopPropagation()">${icon} ${sp.label}</a>`;
+        }).join('');
+
+        subHtml = `
+            <div class="subpages">
+                <div class="subpages-label">${typeLabel}</div>
+                <div class="subpages-chips">${chips}</div>
+            </div>`;
+    }
+
+    return `
+        <div class="card"
+             data-group="${getGroup(repo.name)}"
+             data-search="${repo.name.toLowerCase()} ${(repo.description||'').toLowerCase()} ${(data.title||'').toLowerCase()}"
+             onclick="window.open('${mainUrl}','_blank')">
+
+            <div class="card-banner" style="background:${banner}">
+                ${icon}
+                <span class="badge ${isLive ? 'badge-live' : 'badge-github'}">${isLive ? '● Live' : 'GitHub'}</span>
+            </div>
+
+            <div class="card-body">
+                <a class="card-name" href="${mainUrl}" target="_blank" onclick="event.stopPropagation()">${data.title || repo.name}</a>
+                <a class="card-url"  href="${mainUrl}" target="_blank" onclick="event.stopPropagation()">${displayUrl}</a>
+                <p class="card-desc ${desc.empty ? 'empty' : ''}">${desc.text}</p>
+
+                ${subHtml}
+
+                <div class="card-footer">
+                    <span class="updated">Updated ${timeAgo(repo.updated_at)}</span>
+                    <a class="open-btn ${isLive ? 'btn-live' : 'btn-github'}"
+                       href="${mainUrl}"
+                       target="_blank"
+                       onclick="event.stopPropagation()">
+                        ${isLive ? '🔗 Open Site' : 'GitHub →'}
+                    </a>
+                </div>
+            </div>
+        </div>`;
+}
+
+/* ── FILTER / GROUP ── */
+let activeGroup = 'all';
+
+function applyFilters() {
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    document.querySelectorAll('.group-label').forEach(l => l.remove());
+    const cards = document.querySelectorAll('.card');
+    let visible = 0;
+    cards.forEach(c => {
+        const ok = (activeGroup === 'all' || c.dataset.group === activeGroup)
+                && (!q || c.dataset.search.includes(q));
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+    });
+    if (activeGroup === 'all' && !q) insertGroupLabels();
+    document.getElementById('no-results').style.display = visible ? 'none' : 'block';
+}
+
+function setGroup(g, btn) {
+    activeGroup = g;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+}
+
+function insertGroupLabels() {
+    const grid  = document.getElementById('repos-grid');
+    const cards = [...grid.querySelectorAll('.card')].filter(c => c.style.display !== 'none');
+    let last = null;
+    cards.forEach(card => {
+        const g = card.dataset.group;
+        if (g !== last) {
+            const lbl = document.createElement('div');
+            lbl.className = 'group-label';
+            lbl.textContent = GROUP_LABELS[g] || '📁  Other';
+            grid.insertBefore(lbl, card);
+            last = g;
+        }
     });
 }
 
-// ═══════════════════════════════════════════
-// MERGE — conflict resolution by _modifiedAt
-// If a member exists on both sides, keep the one with the more recent _modifiedAt.
-// Members only on one side are kept as-is.
-// ═══════════════════════════════════════════
-function mergeMembers(local, remote) {
-  const map = new Map();
-  [...local, ...remote].forEach(m => {
-    const existing = map.get(m._uid);
-    if (!existing) { map.set(m._uid, m); return; }
-    const tE = new Date(existing._modifiedAt || existing.addedOn || 0).getTime();
-    const tM = new Date(m._modifiedAt        || m.addedOn        || 0).getTime();
-    if (tM > tE) map.set(m._uid, m);
-  });
-  return [...map.values()];
+/* ── FETCH ── */
+async function fetchRepos() {
+    let page = 1, all = [];
+    while (true) {
+        const r = await fetch(`https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated&page=${page}`);
+        const repos = await r.json();
+        if (!Array.isArray(repos) || !repos.length) break;
+        all = all.concat(repos);
+        if (repos.length < 100) break;
+        page++;
+    }
+    return all;
 }
 
-// ═══════════════════════════════════════════
-// STORAGE
-// ═══════════════════════════════════════════
-function loadLocal() {
-  try { return JSON.parse(localStorage.getItem(SK)||'[]'); } catch { return []; }
-}
-function saveLocal() {
-  localStorage.setItem(SK, JSON.stringify(members));
-}
-async function save() {
-  saveLocal();
-  // Push to Supabase (debounced slightly to batch rapid changes)
-  clearTimeout(save._t);
-  save._t = setTimeout(async () => {
+/* ── MAIN ── */
+async function init() {
     try {
-      _pushing = true;
-      setSyncStatus('syncing', 'Saving…');
-      await sb.from('nosh7_sessions').upsert({ id: SESSION, members, updated_at: new Date().toISOString() });
-      setSyncStatus('live', 'Live');
-    } catch(e) {
-      setSyncStatus('offline', 'Offline');
-      toast('⚠️ Sync failed — working offline', 'err');
-    } finally {
-      _pushing = false;
+        const repos = await fetchRepos();
+
+        /* Stats */
+        const liveCount = Object.values(SITE_DATA).filter(d => d.liveUrl).length;
+        const langs     = [...new Set(repos.map(r => r.language).filter(Boolean))];
+        const pagesCount = Object.values(SITE_DATA)
+            .flatMap(d => (d.subpages||[]).filter(p => p.url)).length;
+
+        document.getElementById('stats').innerHTML = `
+            <div class="stat-pill"><strong>${repos.length}</strong> Projects</div>
+            <div class="stat-pill"><strong>${liveCount}</strong> Live Sites</div>
+            <div class="stat-pill"><strong>${pagesCount}</strong> Sub-pages</div>
+            <div class="stat-pill"><strong>${langs.length}</strong> Languages</div>
+        `;
+
+        /* Sort by group then recency */
+        const sorted = [...repos].sort((a,b) => {
+            const ga = GROUP_ORDER.indexOf(getGroup(a.name));
+            const gb = GROUP_ORDER.indexOf(getGroup(b.name));
+            if (ga !== gb) return ga - gb;
+            return new Date(b.updated_at) - new Date(a.updated_at);
+        });
+
+        document.getElementById('repos-grid').innerHTML = sorted.map(buildCard).join('');
+        insertGroupLabels();
+
+    } catch (err) {
+        document.getElementById('repos-grid').innerHTML = `
+            <div class="state-box">
+                ⚠️ Could not load projects. Check your connection and try again.<br>
+                <small style="opacity:.5;font-size:.8rem">${err.message}</small>
+            </div>`;
     }
-  }, 600);
 }
 
-// ═══════════════════════════════════════════
-// FILE HANDLING
-// ═══════════════════════════════════════════
-function handleDrop(e) { e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag-over'); if(e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
-function handleFileUpload(e) { if(e.target.files[0]) processFile(e.target.files[0]); e.target.value=''; }
-function processFile(file) {
-  const r=new FileReader();
-  r.onload=e=>{
-    try {
-      const rows=parseCSV(e.target.result);
-      if(rows.length<2){toast('CSV empty','err');return;}
-      importMembers(rows[0].map(h=>h.trim()), rows.slice(1).filter(r=>r.some(c=>c.trim())));
-    } catch(err){toast('Error: '+err.message,'err');}
-  };
-  r.readAsText(file);
-}
-function parseCSV(text) {
-  const rows=[];
-  for(const line of text.split(/\r?\n/)){
-    if(!line.trim()) continue;
-    const row=[]; let cell='',inQ=false;
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(c==='"'&&!inQ){inQ=true;}
-      else if(c==='"'&&inQ&&line[i+1]==='"'){cell+='"';i++;}
-      else if(c==='"'&&inQ){inQ=false;}
-      else if((c===','||c==='\t')&&!inQ){row.push(cell.trim());cell='';}
-      else{cell+=c;}
-    }
-    row.push(cell.trim()); rows.push(row);
-  }
-  return rows;
-}
-
-// ═══════════════════════════════════════════
-// IMPORT — adds only new phone+plan combos
-// ═══════════════════════════════════════════
-function importMembers(headers, rows) {
-  const idx=col=>headers.indexOf(col);
-  const get=(row,col)=>{const i=idx(col);return i>=0?(row[i]||'').trim():'';};
-  const isRefresh = uploadMode==='refresh';
-  uploadMode = 'add'; // reset for next upload
-
-  if(isRefresh) {
-    const byUid=new Map(members.map(m=>[m._uid,m]));
-    let updated=0;
-    rows.forEach(row=>{
-      const phone=normalPhone(get(row,COL.phone)); if(!phone) return;
-      const uid=phone+'||'+get(row,COL.planName);
-      const m=byUid.get(uid); if(!m) return;
-      m.remaining   =get(row,COL.remaining);
-      m.planQuota   =get(row,COL.planQuota);
-      m.csvStatus   =get(row,COL.status);
-      m.lastDelivery=get(row,COL.lastDelivery);
-      m.balance     =get(row,COL.balance);
-      m.subEnd      =get(row,COL.subEnd);
-      m._modifiedAt =new Date().toISOString();
-      updated++;
-    });
-    save(); populateDropdowns(); renderAll(); showMain();
-    toast(`🔄 ${updated} members refreshed with latest quota data`, 'ok');
-    return;
-  }
-
-  const existing=new Map(members.map(m=>[m._uid,m]));
-  let added=0,skipped=0;
-  rows.forEach(row=>{
-    const phone=normalPhone(get(row,COL.phone)); if(!phone) return;
-    const plan=get(row,COL.planName);
-    const uid=phone+'||'+plan;
-    if(existing.has(uid)){skipped++;return;}
-    const m={
-      _uid:uid, phone, name:get(row,COL.name)||'Unknown',
-      product:get(row,COL.product), price:get(row,COL.price),
-      quantity:get(row,COL.quantity), csvStatus:get(row,COL.status),
-      subStart:get(row,COL.subStart), subEnd:get(row,COL.subEnd),
-      lastDelivery:get(row,COL.lastDelivery), slot:get(row,COL.slot),
-      planName:plan, planQuota:get(row,COL.planQuota), remaining:get(row,COL.remaining),
-      route:get(row,COL.route), area:get(row,COL.area), zone:get(row,COL.zone), balance:get(row,COL.balance),
-      status:'Pending', followUpDate:'', notes:'',
-      lastContacted:null, lastMethod:null,
-      addedOn:todayStr(), _modifiedAt:new Date().toISOString(),
-    };
-    members.push(m); existing.set(uid,m); added++;
-  });
-  save(); populateDropdowns(); renderAll(); showMain();
-  toast(added>0?`✅ ${added} new members added · ${skipped} already saved`:`No new members · ${skipped} already saved`, added>0?'ok':'');
-}
-function normalPhone(p){return(p||'').replace(/\D/g,'').replace(/^91/,'').slice(-10);}
-
-// ═══════════════════════════════════════════
-// SMART FILTER
-// ═══════════════════════════════════════════
-function smartFilter(list) {
-  const byPhone={};
-  list.forEach(m=>{(byPhone[m.phone]=byPhone[m.phone]||[]).push(m);});
-  const out=[];
-  for(const g of Object.values(byPhone)){
-    const hasLive=g.some(m=>LIVE_RE.test(m.csvStatus));
-    g.forEach(m=>{if(hasLive&&(parseFloat(m.price)||0)<2) return; out.push(m);});
-  }
-  return out;
-}
-
-// ═══════════════════════════════════════════
-// QUOTA CHIPS — dynamic from data
-// ═══════════════════════════════════════════
-function buildQuotaChips() {
-  const list=smartFilter(members);
-  const counts={};
-  list.forEach(m=>{
-    const rem=parseFloat(m.remaining);
-    if(!isNaN(rem)) counts[rem]=(counts[rem]||0)+1;
-  });
-  const activeCount=list.filter(m=>(parseFloat(m.remaining)||0)>0).length;
-  const zeroCount=counts[0]||0;
-
-  // Update the standalone 0-delivery button count
-  const zSpan=document.getElementById('zeroDelivCount');
-  if(zSpan) zSpan.textContent=zeroCount;
-  const zBtn=document.getElementById('zeroDelivBtn');
-  if(zBtn) zBtn.style.background=activeFilter===0?'#fca5a5':'#fff1f2';
-
-  // Build chips (skip 0 — it's the standalone button)
-  const sortedVals=Object.keys(counts).map(Number).sort((a,b)=>a-b).filter(v=>v!==0);
-  const chips=[
-    `<div class="qchip${activeFilter==='all'?' active':''}" onclick="setFilter('all')">All (${list.length})</div>`,
-    `<div class="qchip${activeFilter==='active'?' active':''}" onclick="setFilter('active')">🟢 Active &gt;0 (${activeCount})</div>`,
-    ...sortedVals.map(v=>{
-      const icon=v<=5?'🟠':'🟢';
-      return `<div class="qchip${activeFilter===v?' active':''}" onclick="setFilter(${v})">${icon} ${v} left (${counts[v]})</div>`;
-    })
-  ];
-  document.getElementById('quotaChips').innerHTML=chips.join('');
-}
-function setFilter(val){
-  activeFilter=val;
-  // highlight zero-delivery button when active
-  const zBtn=document.getElementById('zeroDelivBtn');
-  if(zBtn) zBtn.style.background = val===0 ? '#fca5a5' : '#fff1f2';
-  buildQuotaChips();
-  renderCards();
-}
-
-let quotaFilterOpen=false;
-function toggleQuotaFilter(){
-  quotaFilterOpen=!quotaFilterOpen;
-  document.getElementById('quotaBanner').style.display=quotaFilterOpen?'':'none';
-  document.getElementById('quotaToggleBtn').textContent=quotaFilterOpen?'▲ Hide Delivery Filter':'▼ Show Delivery Filter';
-}
-
-// ═══════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════
-function parseDate(s) {
-  if(!s||s==='-'||s==='') return null;
-  let d=new Date(s);
-  if(!isNaN(d.getTime())) return d;
-  const m=s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
-  if(m){d=new Date(`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);if(!isNaN(d.getTime())) return d;}
-  return null;
-}
-
-function renderDashboard() {
-  const list=smartFilter(members);
-  const active=list.filter(m=>(parseFloat(m.remaining)||0)>0);
-  const totalPending=active.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
-  const sc={};
-  members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
-  const zeroCount=list.filter(m=>(parseFloat(m.remaining)||0)===0).length;
-  const todayD=new Date(); todayD.setHours(0,0,0,0);
-  const in7=new Date(todayD); in7.setDate(in7.getDate()+7);
-  const expiringCount=list.filter(m=>{const d=parseDate(m.subEnd);return d&&d>=todayD&&d<=in7;}).length;
-
-  document.getElementById('dashKpis').innerHTML=`
-    <div class="dash-kpi green clickable${activeDashKpi==='active'?' active-kpi':''}" onclick="dashFilterBy('quota','active')"><div class="kpi-num">${active.length}</div><div class="kpi-label">🟢 Active Customers</div></div>
-    <div class="dash-kpi blue"><div class="kpi-num">${totalPending}</div><div class="kpi-label">📦 Pending Deliveries</div></div>
-    <div class="dash-kpi orange clickable${activeDashKpi==='followup'?' active-kpi':''}" onclick="dashFilterBy('status','Follow-Up')"><div class="kpi-num">${sc['Follow-Up']||0}</div><div class="kpi-label">🔔 Follow-Up</div></div>
-    <div class="dash-kpi purple clickable${activeDashKpi==='converted'?' active-kpi':''}" onclick="dashFilterBy('status','Converted')"><div class="kpi-num">${sc['Converted']||0}</div><div class="kpi-label">✅ Renewed</div></div>
-    <div class="dash-kpi red clickable${activeDashKpi==='zero'?' active-kpi':''}" onclick="dashFilterBy('quota','zero')"><div class="kpi-num">${zeroCount}</div><div class="kpi-label">🔴 Zero Remaining</div></div>
-    <div class="dash-kpi amber clickable${activeDashKpi==='expiring'?' active-kpi':''}" onclick="dashFilterBy('expiring','expiring')"><div class="kpi-num">${expiringCount}</div><div class="kpi-label">⏳ Expiring in 7d</div></div>
-    <div class="dash-kpi clickable${activeDashKpi==='all'?' active-kpi':''}" onclick="dashFilterBy('all','all')"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
-  `;
-
-  const byRoute={};
-  active.forEach(m=>{
-    const key=m.route||m.area||'Unknown';
-    if(!byRoute[key]) byRoute[key]={count:0,deliveries:0};
-    byRoute[key].count++;
-    byRoute[key].deliveries+=parseFloat(m.remaining)||0;
-  });
-  const maxC=Math.max(1,...Object.values(byRoute).map(r=>r.count));
-  const sorted=Object.entries(byRoute).sort((a,b)=>b[1].count-a[1].count);
-  document.getElementById('batchRows').innerHTML=sorted.length
-    ?sorted.map(([route,d])=>`
-      <tr>
-        <td class="td-name">${esc(route)}</td>
-        <td class="td-num">${d.count}</td>
-        <td class="td-num">${d.deliveries}</td>
-        <td class="td-num">${(d.deliveries/d.count).toFixed(1)}</td>
-        <td><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(d.count/maxC*100)}%"></div></div></td>
-      </tr>`).join('')
-    :`<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:18px">No active customers</td></tr>`;
-}
-function toggleBatch(){batchOpen=!batchOpen;document.getElementById('batchBody').style.display=batchOpen?'':'none';document.getElementById('batchToggle').textContent=batchOpen?'▲ collapse':'▼ expand';}
-
-// ═══════════════════════════════════════════
-// DASHBOARD KPI CLICK FILTERING
-// ═══════════════════════════════════════════
-function dashFilterBy(type, kpiId) {
-  activeDashKpi = kpiId;
-  if(type === 'quota') {
-    activeFilter = kpiId === 'active' ? 'active' : kpiId === 'zero' ? 0 : 'all';
-    document.getElementById('fStatus').value = '';
-  } else if(type === 'status') {
-    activeFilter = 'all';
-    document.getElementById('fStatus').value = kpiId;
-  } else if(type === 'expiring') {
-    activeFilter = 'expiring';
-    document.getElementById('fStatus').value = '';
-  } else {
-    activeFilter = 'all';
-    document.getElementById('fStatus').value = '';
-  }
-  buildQuotaChips();
-  renderDashboard();
-  renderCards();
-}
-function resetDashKpi() {
-  activeDashKpi = null;
-  renderDashboard();
-}
-function resetAllFilters() {
-  activeFilter = 'all';
-  activeDashKpi = null;
-  document.getElementById('fStatus').value = '';
-  document.getElementById('fPlan').value = '';
-  document.getElementById('fArea').value = '';
-  document.getElementById('fFollowup').value = '';
-  document.getElementById('fSearch').value = '';
-  document.getElementById('fLdFrom').value = '';
-  document.getElementById('fLdTo').value = '';
-  buildQuotaChips();
-  renderDashboard();
-  renderCards();
-}
-
-// ═══════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════
-function renderAll(){renderDashboard();buildQuotaChips();renderCards();updateHeader();}
-
-function renderCards() {
-  const fStat=document.getElementById('fStatus').value;
-  const fPlan=document.getElementById('fPlan').value;
-  const fArea=document.getElementById('fArea').value;
-  const fFU=document.getElementById('fFollowup').value;
-  const fLdFrom=document.getElementById('fLdFrom').value;
-  const fLdTo=document.getElementById('fLdTo').value;
-  const search=document.getElementById('fSearch').value.toLowerCase();
-  const today=todayStr();
-
-  let list=smartFilter(members);
-
-  if(activeFilter==='active')          list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r>0;});
-  else if(activeFilter==='expiring')   {const td=new Date();td.setHours(0,0,0,0);const i7=new Date(td);i7.setDate(i7.getDate()+7);list=list.filter(m=>{const d=parseDate(m.subEnd);return d&&d>=td&&d<=i7;});}
-  else if(activeFilter!=='all')        list=list.filter(m=>{const r=parseFloat(m.remaining);return !isNaN(r)&&r===activeFilter;});
-
-  if(fStat) list=list.filter(m=>m.status===fStat);
-  if(fPlan) list=list.filter(m=>m.planName===fPlan);
-  if(fArea) list=list.filter(m=>m.area===fArea||m.route===fArea);
-  if(fFU==='today')    list=list.filter(m=>m.followUpDate===today);
-  if(fFU==='overdue')  list=list.filter(m=>m.followUpDate&&m.followUpDate<today);
-  if(fFU==='upcoming') list=list.filter(m=>m.followUpDate&&m.followUpDate>today);
-
-  if(fLdFrom||fLdTo){
-    document.getElementById('ldClear').style.display='';
-    list=list.filter(m=>{
-      const ld=(m.lastDelivery||'').split(' ')[0];
-      if(!ld||ld==='-') return false;
-      if(fLdFrom&&ld<fLdFrom) return false;
-      if(fLdTo  &&ld>fLdTo)   return false;
-      return true;
-    });
-  } else { document.getElementById('ldClear').style.display='none'; }
-
-  if(search) list=list.filter(m=>m.name.toLowerCase().includes(search)||m.phone.includes(search));
-  list.sort((a,b)=>sortScore(a,today)-sortScore(b,today)||a.name.localeCompare(b.name));
-
-  const total=smartFilter(members).length;
-  const sb=document.getElementById('showingBar');
-  if(sb) sb.textContent=list.length===total?`Showing all ${list.length} members`:`Showing ${list.length} of ${total} members`;
-
-  if(activeFilter==='all')            document.getElementById('qbHint').textContent='';
-  else if(activeFilter==='active')    document.getElementById('qbHint').textContent=`${list.length} active members with deliveries remaining`;
-  else if(activeFilter==='expiring')  document.getElementById('qbHint').textContent=`${list.length} members expiring within 7 days`;
-  else                                document.getElementById('qbHint').textContent=`${list.length} members with exactly ${activeFilter} deliveries left`;
-
-  _lastFilteredList = list;
-  const allSids=list.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
-  const saEl=document.getElementById('selectAllCb');
-  if(saEl){saEl.checked=allSids.length>0&&allSids.every(s=>selectedMembers.has(s));saEl.indeterminate=!saEl.checked&&allSids.some(s=>selectedMembers.has(s));}
-
-  const grid=document.getElementById('cardsGrid');
-  if(!list.length){grid.innerHTML=`<div class="empty-state"><h3>No members match</h3><p>Try a different filter</p></div>`;renderBulkBar();return;}
-  grid.innerHTML=list.map(m=>buildCard(m,today)).join('');
-  renderBulkBar();
-}
-
-function sortScore(m,today){
-  if(m.followUpDate&&m.followUpDate<today) return 0;
-  if(m.followUpDate===today)               return 1;
-  const r=parseFloat(m.remaining);
-  if(!isNaN(r)&&r===0) return 2;
-  if(!isNaN(r)&&r<=5)  return 3;
-  return 4;
-}
-
-function buildCard(m,today){
-  const sc=(m.status||'Pending').toLowerCase().replace(/[\s-]+/g,'');
-  const rem=parseFloat(m.remaining);
-  let qchip='';
-  if(!isNaN(rem)){const cls=rem===0?'qc-zero':rem<=5?'qc-low':'qc-ok';qchip=`<span class="qchip-card ${cls}">${rem===0?'🔴':rem<=5?'🟠':'🟢'} ${rem} deliveries left</span>`;}
-  let fup='';
-  if(m.followUpDate){
-    if(m.followUpDate<today)        fup=`<div class="fupill fp-overdue">⚠️ Overdue: ${m.followUpDate}</div>`;
-    else if(m.followUpDate===today)  fup=`<div class="fupill fp-today">🔔 Follow up TODAY</div>`;
-    else                             fup=`<div class="fupill fp-upcoming">📅 Follow-up: ${m.followUpDate}</div>`;
-  }
-  const rows=[
-    m.product     &&['Product',    m.product],
-    m.planName    &&['Plan',       m.planName],
-    m.price       &&['Price/unit', '₹'+m.price],
-    m.slot        &&['Slot',       m.slot],
-    m.area        &&['Area',       m.area+(m.zone&&m.zone!==m.area?' · '+m.zone:'')],
-    m.lastDelivery&&m.lastDelivery!=='-'&&['Last Delivery',m.lastDelivery.split(' ')[0]],
-    m.balance&&parseFloat(m.balance)!=0&&['Balance','₹'+m.balance],
-  ].filter(Boolean);
-  const sid=m._uid.replace(/[^a-z0-9]/gi,'_');
-  return `
-<div class="card s-${sc}">
-  <div class="card-hdr">
-    <input type="checkbox" id="cb_${sid}" class="member-cb" ${selectedMembers.has(sid)?'checked':''} onclick="event.stopPropagation();toggleSelect('${sid}')">
-    <div style="flex:1"><div class="card-name">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
-    <span class="sbadge b-${sc}">${m.status}</span>
-  </div>
-  <div class="card-body">
-    ${rows.map(([k,v])=>`<div class="cr"><span class="lbl">${k}</span><span class="val">${esc(v)}</span></div>`).join('')}
-    ${qchip}${fup}
-    ${m.notes?`<div class="notes-row">💬 ${esc(m.notes.substring(0,80))}${m.notes.length>80?'…':''}</div>`:''}
-  </div>
-  <div class="card-footer">
-    <a href="https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}" target="_blank" rel="noopener" class="btn btn-wa" onclick="onWA('${sid}')">💬 WhatsApp</a>
-    <a href="tel:+91${m.phone}" class="btn btn-call" onclick="onCall('${sid}')">📞 Call</a>
-    <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openStatus('${sid}',null)">✏️ Update</button>
-  </div>
-</div>`;
-}
-
-// ═══════════════════════════════════════════
-// CONTACT HANDLERS
-// ═══════════════════════════════════════════
-function findM(sid){return members.find(m=>m._uid.replace(/[^a-z0-9]/gi,'_')===sid);}
-function onWA(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='WhatsApp';save();pendingContact={sid,method:'WhatsApp'};localStorage.setItem(PK,JSON.stringify(pendingContact));}
-function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='Call';save();pendingContact={sid,method:'Call'};localStorage.setItem(PK,JSON.stringify(pendingContact));setTimeout(triggerModal,1200);}
-function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
-function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
-
-// ═══════════════════════════════════════════
-// STATUS MODAL
-// ═══════════════════════════════════════════
-let _sid=null;
-function openStatus(sid,method){
-  _sid=sid;const m=findM(sid);if(!m)return;
-  document.getElementById('statusSub').textContent=method?`You ${method==='WhatsApp'?'messaged':'called'} ${m.name} — outcome?`:`Update: ${m.name} (${m.phone})`;
-  document.getElementById('mStatus').value=m.status==='Pending'?'Contacted':m.status;
-  document.getElementById('mDate').value=m.followUpDate||'';
-  document.getElementById('mNotes').value=m.notes||'';
-  document.getElementById('statusModal').classList.remove('hidden');
-}
-function closeStatus(){document.getElementById('statusModal').classList.add('hidden');clearPending();_sid=null;}
-function saveStatus(){
-  if(!_sid)return;const m=findM(_sid);if(!m)return;
-  m.status      =document.getElementById('mStatus').value.split(' — ')[0];
-  m.followUpDate=document.getElementById('mDate').value;
-  m.notes       =document.getElementById('mNotes').value;
-  m._modifiedAt =new Date().toISOString(); // stamp for conflict resolution
-  save();closeStatus();renderAll();toast('Status updated ✅','ok');
-}
-document.getElementById('statusModal').addEventListener('click',function(e){if(e.target===this)closeStatus();});
-
-// ═══════════════════════════════════════════
-// TEMPLATE
-// ═══════════════════════════════════════════
-function loadTemplate(){const s=localStorage.getItem(TK);if(s)document.getElementById('waTemplate').value=s;}
-function saveTemplate(){localStorage.setItem(TK,document.getElementById('waTemplate').value);toast('Template saved ✅','ok');}
-function buildWAMsg(m){
-  return(document.getElementById('waTemplate').value||'Hello {name}!')
-    .replace(/{name}/g,m.name||'').replace(/{phone}/g,m.phone||'')
-    .replace(/{plan}/g,m.planName||'').replace(/{units}/g,m.remaining||'0')
-    .replace(/{product}/g,m.product||'').replace(/{price}/g,m.price?'₹'+m.price:'')
-    .replace(/{area}/g,m.area||'').replace(/{slot}/g,m.slot||'');
-}
-function togglePanel(){tplOpen=!tplOpen;document.getElementById('tplBody').style.display=tplOpen?'':'none';document.getElementById('tplIcon').textContent=tplOpen?'▲ collapse':'▼ expand';}
-
-// ═══════════════════════════════════════════
-// DROPDOWNS / MISC
-// ═══════════════════════════════════════════
-function populateDropdowns(){
-  const plans=[...new Set(members.map(m=>m.planName).filter(Boolean))].sort();
-  const areas=[...new Set(members.map(m=>m.area||m.route).filter(Boolean))].sort();
-  const ps=document.getElementById('fPlan'),pc=ps.value;
-  ps.innerHTML='<option value="">All Plans</option>'+plans.map(p=>`<option>${esc(p)}</option>`).join('');if(pc)ps.value=pc;
-  const as=document.getElementById('fArea'),ac=as.value;
-  as.innerHTML='<option value="">All Areas</option>'+areas.map(a=>`<option>${esc(a)}</option>`).join('');if(ac)as.value=ac;
-}
-function clearDates(){document.getElementById('fLdFrom').value='';document.getElementById('fLdTo').value='';renderCards();}
-
-function showMain(){
-  document.getElementById('uploadZone').style.display='none';
-  document.getElementById('mainContent').style.display='';
-  updateHeader();
-}
-function updateHeader(){
-  const active=smartFilter(members).filter(m=>(parseFloat(m.remaining)||0)>0).length;
-  document.getElementById('headerSub').textContent=`${members.length} members · ${active} active`;
-}
-function confirmClear(){
-  if(!confirm('Delete ALL data on all devices? This cannot be undone.')) return;
-  members=[];saveLocal();
-  sb.from('nosh7_sessions').delete().eq('id',SESSION).then(()=>{});
-  document.getElementById('uploadZone').style.display='';
-  document.getElementById('mainContent').style.display='none';
-  document.getElementById('headerSub').textContent='Connecting…';
-  toast('Data cleared','err');
-}
-
-function exportCSV(){
-  if(!members.length){toast('No data','err');return;}
-  const cols=['name','phone','planName','product','price','remaining','planQuota','csvStatus','area','route','slot','status','followUpDate','notes','lastContacted','lastMethod','addedOn'];
-  const blob=new Blob([cols.join(',')+'\n'+members.map(m=>cols.map(c=>`"${(m[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nosh7_outreach_${todayStr()}.csv`;a.click();
-}
-
-// ═══════════════════════════════════════════
-// BULK SELECTION & WHATSAPP
-// ═══════════════════════════════════════════
-function toggleSelect(sid) {
-  if(selectedMembers.has(sid)) selectedMembers.delete(sid);
-  else selectedMembers.add(sid);
-  const cb=document.getElementById('cb_'+sid);
-  if(cb) cb.checked=selectedMembers.has(sid);
-  const allSids=_lastFilteredList.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
-  const saEl=document.getElementById('selectAllCb');
-  if(saEl){saEl.checked=allSids.length>0&&allSids.every(s=>selectedMembers.has(s));saEl.indeterminate=!saEl.checked&&allSids.some(s=>selectedMembers.has(s));}
-  renderBulkBar();
-}
-function toggleSelectAll() {
-  const allSids=_lastFilteredList.map(m=>m._uid.replace(/[^a-z0-9]/gi,'_'));
-  const allSelected=allSids.every(s=>selectedMembers.has(s));
-  if(allSelected) allSids.forEach(s=>selectedMembers.delete(s));
-  else allSids.forEach(s=>selectedMembers.add(s));
-  renderCards();
-}
-function renderBulkBar() {
-  const bar=document.getElementById('bulkBar');
-  if(!bar) return;
-  if(selectedMembers.size===0){bar.style.display='none';return;}
-  bar.style.display='flex';
-  const el=document.getElementById('bulkCount');
-  if(el) el.textContent=selectedMembers.size+' selected';
-}
-function bulkWhatsApp() {
-  const toContact=_lastFilteredList.filter(m=>selectedMembers.has(m._uid.replace(/[^a-z0-9]/gi,'_')));
-  if(!toContact.length){toast('No selected members in current view','err');return;}
-  toContact.forEach((m,i)=>{
-    setTimeout(()=>{
-      window.open(`https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}`,'_blank');
-    },i*700);
-  });
-  toast(`Opening WhatsApp for ${toContact.length} members…`,'ok');
-}
-function clearSelection(){selectedMembers.clear();renderCards();}
-
-function todayStr() {return new Date().toISOString().split('T')[0];}
-function fmtDate(iso){return iso?new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):''}
-function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toast(msg,type=''){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+type;
-  clearTimeout(t._t);t._t=setTimeout(()=>{t.className='toast hidden';},3800);
-}
+init();
 </script>
 </body>
 </html>
