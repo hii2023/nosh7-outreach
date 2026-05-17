@@ -42,6 +42,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { background:var(--blue-dark); }
 .btn-wa   { background:var(--green); color:#fff; font-size:12px; padding:7px 10px; } .btn-wa:hover   { background:var(--green-dark); }
 .btn-call { background:var(--blue);  color:#fff; font-size:12px; padding:7px 10px; } .btn-call:hover { background:var(--blue-dark); }
+.btn-rekart { background:#7c3aed; color:#fff; font-size:12px; padding:7px 10px; } .btn-rekart:hover { background:#6d28d9; }
 .btn-outline { background:#fff; color:var(--gray-700); border:1px solid var(--gray-300); } .btn-outline:hover { background:var(--gray-50); }
 .btn-sm { padding:5px 10px; font-size:12px; border-radius:6px; }
 .btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-size:12px; padding:6px 11px; } .btn-ghost:hover { background:rgba(255,255,255,.15); }
@@ -133,7 +134,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .card.s-converted     { border-left-color:var(--brand); }
 .card.s-notinterested { border-left-color:var(--red); }
 .card-hdr { padding:12px 14px 8px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.card-name { font-size:14px; font-weight:700; }
+.card-name { font-size:14px; font-weight:700; cursor:pointer; } .card-name:hover { color:#7c3aed; text-decoration:underline; }
 .card-mob  { font-size:11px; color:var(--gray-400); margin-top:1px; }
 .sbadge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
 .b-pending       { background:#fef9c3; color:#854d0e; }
@@ -876,7 +877,7 @@ function buildCard(m,today){
 <div class="card s-${sc}">
   <div class="card-hdr">
     <input type="checkbox" id="cb_${sid}" class="member-cb" ${selectedMembers.has(sid)?'checked':''} onclick="event.stopPropagation();toggleSelect('${sid}')">
-    <div style="flex:1"><div class="card-name">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
+    <div style="flex:1"><div class="card-name" onclick="openRekart('${m.phone}')">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
     <span class="sbadge b-${sc}">${m.status}</span>
   </div>
   <div class="card-body">
@@ -887,6 +888,7 @@ function buildCard(m,today){
   <div class="card-footer">
     <a href="https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}" target="_blank" rel="noopener" class="btn btn-wa" onclick="onWA('${sid}')">💬 WhatsApp</a>
     <a href="tel:+91${m.phone}" class="btn btn-call" onclick="onCall('${sid}')">📞 Call</a>
+    <button class="btn btn-rekart btn-sm" onclick="openRekart('${m.phone}')">🔍 Rekart</button>
     <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openStatus('${sid}',null)">✏️ Update</button>
   </div>
 </div>`;
@@ -900,6 +902,11 @@ function onWA(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().to
 function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='Call';save();pendingContact={sid,method:'Call'};localStorage.setItem(PK,JSON.stringify(pendingContact));setTimeout(triggerModal,1200);}
 function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
 function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
+function openRekart(phone){
+  navigator.clipboard.writeText(phone).catch(()=>{});
+  window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
+  toast('📋 Phone '+phone+' copied — paste in Rekart search','ok');
+}
 
 // ═══════════════════════════════════════════
 // STATUS MODAL
