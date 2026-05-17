@@ -903,9 +903,7 @@ function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().
 function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
 function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
 function openRekart(phone){
-  navigator.clipboard.writeText(phone).catch(()=>{});
-  window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
-  toast('📋 Phone '+phone+' copied — paste in Rekart search','ok');
+  window.open('https://app.rekart.io/app/main/overview#rkSearch='+phone,'_blank','noopener');
 }
 
 // ═══════════════════════════════════════════
