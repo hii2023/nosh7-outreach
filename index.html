@@ -253,6 +253,18 @@ Team NOSH7 🌱
     </div>
   </div>
 
+  <!-- REKART TOKEN -->
+  <div class="panel" style="margin-top:8px">
+    <div class="panel-hdr" onclick="toggleRkPanel()">
+      <h3>🔍 Rekart Token &nbsp;<span id="rkIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveRkToken()">Save</button>
+    </div>
+    <div class="panel-body" id="rkBody" style="display:none;padding:10px 14px">
+      <input id="rkToken" type="password" placeholder="Paste your Rekart token here…" style="width:100%;padding:8px 10px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:monospace;box-sizing:border-box">
+      <div class="hints" style="margin-top:8px">Get it once from Rekart → open any page → browser console (F12) → paste: <code>JSON.parse(localStorage.userData).user.token</code></div>
+    </div>
+  </div>
+
   <!-- ═══ DASHBOARD ═══ -->
   <div class="dash-section" style="margin-bottom:14px">
     <div class="dash-section-hdr" style="cursor:default;justify-content:flex-start;gap:10px">
@@ -426,6 +438,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Load from local cache immediately (instant UI)
   members = loadLocal();
   loadTemplate();
+  loadRkToken();
   try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
 
   if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
@@ -902,8 +915,42 @@ function onWA(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().to
 function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='Call';save();pendingContact={sid,method:'Call'};localStorage.setItem(PK,JSON.stringify(pendingContact));setTimeout(triggerModal,1200);}
 function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
 function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
-function openRekart(phone){
-  window.open('https://app.rekart.io/app/main/overview#rkSearch='+phone,'_blank','noopener');
+// ═══════════════════════════════════════════
+// REKART TOKEN SETTINGS
+// ═══════════════════════════════════════════
+const RK_KEY = 'nosh7_rk_token';
+function toggleRkPanel(){const b=document.getElementById('rkBody');const ic=document.getElementById('rkIcon');const open=b.style.display==='none';b.style.display=open?'block':'none';ic.textContent=open?'▲ collapse':'▼ expand';}
+function saveRkToken(){const t=document.getElementById('rkToken').value.trim();if(!t){toast('Paste your token first','err');return;}localStorage.setItem(RK_KEY,t);toast('Rekart token saved ✅','ok');toggleRkPanel();}
+function loadRkToken(){const t=localStorage.getItem(RK_KEY);if(t&&document.getElementById('rkToken'))document.getElementById('rkToken').value=t;}
+
+async function openRekart(phone){
+  const token = localStorage.getItem(RK_KEY);
+  if(!token){
+    // No token saved — show settings panel and prompt
+    document.getElementById('rkBody').style.display='block';
+    document.getElementById('rkIcon').textContent='▲ collapse';
+    document.getElementById('rkToken').focus();
+    toast('Save your Rekart token first 👆','err');
+    return;
+  }
+  toast('🔍 Looking up '+phone+'…','');
+  try {
+    const res = await fetch(SB_URL+'/functions/v1/rekart-search',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({phone, token})
+    });
+    const data = await res.json();
+    if(data.id){
+      window.open('https://app.rekart.io/app/main/customers/'+data.id+'/profile','_blank','noopener');
+    } else {
+      toast('Customer not found in Rekart','err');
+      window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
+    }
+  } catch(e){
+    toast('Rekart lookup failed','err');
+    window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
+  }
 }
 
 // ═══════════════════════════════════════════
