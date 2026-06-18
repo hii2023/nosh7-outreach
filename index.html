@@ -1004,8 +1004,17 @@ const WA_APP_KEY='nosh7_wa_app';
 function buildWhatsAppLink(phone,msg){
   const app=localStorage.getItem(WA_APP_KEY)||'personal';
   const link=encodeURIComponent(msg);
+  const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
   if(app==='business'){
-    return `whatsappbusiness://send?phone=91${phone}&text=${link}`;
+    if(isMob){
+      // Mobile: try WhatsApp Business deep link
+      return `intent://send?phone=91${phone}&text=${link}#Intent;scheme=whatsappbusiness;package=com.whatsapp.w4b;end`;
+    } else {
+      // Web: WhatsApp Business not available via deep link, use regular wa.me with note
+      toast('Business option works on mobile. Using standard WhatsApp on web.','');
+      return `https://wa.me/91${phone}?text=${link}`;
+    }
   }
   return `https://wa.me/91${phone}?text=${link}`;
 }
