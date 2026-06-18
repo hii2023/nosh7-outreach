@@ -679,41 +679,23 @@ function smartFilter(list) {
   const out=[];
   for(const g of Object.values(byPhone)){
     const hasLive=g.some(m=>LIVE_RE.test(m.csvStatus));
-    // 1) drop cheap add-ons (price < 2) when this customer has a live plan
+    // drop cheap add-ons (price < 2) when customer has a live plan
     let kept=g.filter(m=>!(hasLive&&(parseFloat(m.price)||0)<2));
     if(!kept.length) kept=g;
 
-    // 2) if any plan is ACTIVE and has units > 0, hide all zero-unit plans
-    const hasActiveWithUnits=kept.some(m=>LIVE_RE.test(m.csvStatus)&&(parseFloat(m.remaining)||0)>0);
-    if(hasActiveWithUnits){
-      kept=kept.filter(m=>(parseFloat(m.remaining)||0)>0);
-    } else {
-      // if all plans are zero, keep only the one with most recent last delivery date
-      const zeroPlans=kept.filter(m=>(parseFloat(m.remaining)||0)===0);
-      if(zeroPlans.length>1){
-        kept=[zeroPlans.reduce((a,b)=>{
-          const dateA=parseDate(a.lastDelivery)||new Date(0);
-          const dateB=parseDate(b.lastDelivery)||new Date(0);
-          return dateB>dateA?b:a;
-        })];
-      } else if(zeroPlans.length>0) {
-        kept=zeroPlans;
-      }
-    }
+    // sort by: highest remaining count first, then by most recent last delivery
+    kept.sort((a,b)=>{
+      const remA=parseFloat(a.remaining)||0;
+      const remB=parseFloat(b.remaining)||0;
+      if(remB!==remA) return remB-remA; // higher count wins
+      const dateA=parseDate(a.lastDelivery)||new Date(0);
+      const dateB=parseDate(b.lastDelivery)||new Date(0);
+      return dateB-dateA; // more recent delivery wins on tie
+    });
 
-    // 3) collapse to ONE plan per customer: the one with the MOST units remaining
-    if(kept.length>0){
-      const best=kept.reduce((a,b)=>planRank(b)>planRank(a)?b:a);
-      out.push(best);
-    }
+    out.push(kept[0]);
   }
   return out;
-}
-// Rank a plan record so the "best" plan per customer wins the collapse:
-//   1) most deliveries remaining  2) live status  3) bigger plan quota
-function planRank(m){
-  const rem=parseFloat(m.remaining);
-  return (isNaN(rem)?-1:rem)*1e6 + (LIVE_RE.test(m.csvStatus)?1e3:0) + (parseFloat(m.planQuota)||0);
 }
 
 // ═══════════════════════════════════════════
