@@ -682,8 +682,13 @@ function smartFilter(list) {
     // 1) drop cheap add-ons (price < 2) when this customer has a live plan
     let kept=g.filter(m=>!(hasLive&&(parseFloat(m.price)||0)<2));
     if(!kept.length) kept=g; // never drop a customer entirely
-    // 2) collapse to ONE plan per customer: the one with the MOST units remaining
-    //    (keeps the active plan visible even if another plan shows 0 left)
+
+    // 2) if customer has ANY plan with units > 0, discard ALL zero-unit plans
+    //    (so Plan A=0 + Plan B=15 shows only Plan B, not blocked by Plan A)
+    const nonZeroPlans=kept.filter(m=>(parseFloat(m.remaining)||0)>0);
+    if(nonZeroPlans.length>0) kept=nonZeroPlans;
+
+    // 3) collapse to ONE plan per customer: the one with the MOST units remaining
     const best=kept.reduce((a,b)=>planRank(b)>planRank(a)?b:a);
     out.push(best);
   }
