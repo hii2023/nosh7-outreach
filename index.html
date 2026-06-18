@@ -270,22 +270,28 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
     <div class="panel-hdr" onclick="togglePanel()" style="cursor:pointer">
       <h3>💬 WhatsApp Message &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
     </div>
-    <div class="panel-body" id="tplBody" style="display:none;font-size:13px;line-height:1.6;color:var(--gray-600)">
+    <div class="panel-body" id="tplBody" style="display:none;font-size:12px;line-height:1.7;color:var(--gray-600)">
       <strong>Auto-selected templates (random each time):</strong>
       <br><br>
-      <strong style="color:var(--red)">When Remaining = 0:</strong>
-      <ul style="margin:8px 0 8px 20px">
-        <li>Your subscription has ended. How was the experience? What would make you continue this plan or achieve your goal through it? Please share your suggestions.</li>
-        <li>Your subscription period has ended. How was it for you? What would help you renew or reach your wellness goals? Your feedback matters to us.</li>
-        <li>Your plan has expired. We'd like your thoughts on the experience. What would encourage you to continue or achieve your goals with us? Please share.</li>
-      </ul>
-      <strong style="color:var(--orange)">When Remaining &gt; 0:</strong>
-      <ul style="margin:8px 0 8px 20px">
-        <li>Your subscription will end soon. How has the experience been? What would make you continue this plan or achieve your goal through it? Please share your suggestions.</li>
-        <li>Your plan is expiring soon. How are you liking it? What would help you renew or reach your wellness goals? We'd value your feedback.</li>
-        <li>Your subscription is about to expire. What's your experience so far? What would encourage you to continue or achieve your goals with us? Please share your thoughts.</li>
-      </ul>
-      <div class="hints" style="margin-top:12px;color:var(--gray-500)">Note: Hi + first name only. No signature. No emojis or symbols.</div>
+      <strong style="color:var(--red)">When Remaining = 0 (6 templates):</strong>
+      <div style="margin:8px 0 8px 16px;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">
+Hi {name}, your subscription has ended.
+We miss you and want to help with your food experience.
+How were the meals? What would make you continue?
+Type YES to renew.
+      </div>
+      <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
+      <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 (6 templates):</strong>
+      <div style="margin:8px 0 8px 16px;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--orange);white-space:pre-wrap;font-family:monospace;font-size:11px">
+Hi {name}, your subscription is ending soon.
+We want to help you continue your food and wellness journey.
+How is your experience? What would make you renew?
+Type YES to continue.
+      </div>
+      <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
+      <div class="hints" style="margin-top:14px;color:var(--gray-500);padding:10px;background:var(--gray-50);border-radius:6px">
+        <strong>Format:</strong> Name on first line • Multi-line for readability • Tone: helping with food experience • Type YES to continue • No signature, no emojis
+      </div>
     </div>
   </div>
 
@@ -1063,14 +1069,20 @@ document.getElementById('statusModal').addEventListener('click',function(e){if(e
 // ═══════════════════════════════════════════
 const WA_TEMPLATES={
   zero:[
-    'Hi {name}, your subscription has ended. How was the experience? What would make you continue this plan or achieve your goal through it? Please share your suggestions.',
-    'Hi {name}, your subscription period has ended. How was it for you? What would help you renew or reach your wellness goals? Your feedback matters to us.',
-    'Hi {name}, your plan has expired. We would like your thoughts on the experience. What would encourage you to continue or achieve your goals with us? Please share.'
+    'Hi {name}, your subscription has ended.\nWe miss you and want to help you with your food experience. How were the meals? What would make you want to continue your wellness journey with NOSH7?\nType YES to renew.',
+    'Hi {name}, your subscription is over.\nWe care about supporting your nutrition goals. How did you like our meals? What would encourage you to restart your healthy eating?\nType YES if interested.',
+    'Hi {name}, your plan has expired.\nWe are here to help you achieve your food and health goals. What was your experience with us? What would help you come back?\nType YES to continue.',
+    'Hi {name}, your subscription has ended.\nWe want to support your wellness journey. How was the meal quality? What would motivate you to renew your NOSH7 plan?\nType YES to explore options.',
+    'Hi {name}, your subscription is finished.\nWe believe in helping you achieve your nutrition goals through quality food. How was your experience? What would make you restart?\nType YES if you are interested.',
+    'Hi {name}, your plan ended.\nWe are committed to supporting your food and health goals. How did our meals work for you? What changes would help you continue?\nType YES to renew.'
   ],
   active:[
-    'Hi {name}, your subscription will end soon. How has the experience been? What would make you continue this plan or achieve your goal through it? Please share your suggestions.',
-    'Hi {name}, your plan is expiring soon. How are you liking it? What would help you renew or reach your wellness goals? We would value your feedback.',
-    'Hi {name}, your subscription is about to expire. What is your experience so far? What would encourage you to continue or achieve your goals with us? Please share your thoughts.'
+    'Hi {name}, your subscription is ending soon.\nWe want to help you continue your food and wellness journey. How is your experience with the meals? What would make you renew?\nType YES to continue.',
+    'Hi {name}, your plan expires soon.\nWe care about supporting your nutrition goals. How are the meals working for you? What would encourage you to keep going?\nType YES if interested.',
+    'Hi {name}, your subscription will end shortly.\nWe are here to help you achieve your health goals through quality food. How has the experience been? What would make you stay with us?\nType YES to renew.',
+    'Hi {name}, your plan runs out soon.\nWe want to support your wellness journey. How is your experience so far? What would help you continue your healthy eating goals?\nType YES to keep going.',
+    'Hi {name}, your subscription ends soon.\nWe believe in helping you with the food experience you need. How are you liking the meals? What would motivate you to renew?\nType YES if interested.',
+    'Hi {name}, your plan expires soon.\nWe are committed to supporting your nutrition goals. How has it been for you? What would make you want to continue your wellness journey?\nType YES to renew.'
   ]
 };
 function buildWAMsg(m){
