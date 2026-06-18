@@ -907,7 +907,14 @@ function renderCards() {
   } else { document.getElementById('ldClear').style.display='none'; }
 
   if(search) list=list.filter(m=>m.name.toLowerCase().includes(search)||m.phone.includes(search));
-  list.sort((a,b)=>sortScore(a,today)-sortScore(b,today)||a.name.localeCompare(b.name));
+  list.sort((a,b)=>{
+    const s=sortScore(a,today)-sortScore(b,today);
+    if(s!==0) return s;
+    const dA=parseDate(a.lastDelivery)||new Date(0);
+    const dB=parseDate(b.lastDelivery)||new Date(0);
+    if(dB.getTime()!==dA.getTime()) return dB-dA; // most recent first
+    return a.name.localeCompare(b.name);
+  });
 
   const total=smartFilter(members).length;
   const sb=document.getElementById('showingBar');
