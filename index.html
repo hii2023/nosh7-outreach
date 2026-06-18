@@ -241,6 +241,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   </div>
   <div class="header-right">
     <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
+    <select id="waAppSelect" onchange="saveWAAppChoice()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 9px;font-size:12px;font-weight:600;cursor:pointer;height:32px">
+      <option value="personal">WhatsApp</option>
+      <option value="business">Business</option>
+    </select>
     <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆<span class="btn-label"> Add New</span></button>
     <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄<span class="btn-label"> Refresh</span></button>
     <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
@@ -493,6 +497,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Load from local cache immediately (instant UI)
   members = loadLocal();
   loadRkToken();
+  loadWAAppChoice();
   try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
 
   if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
@@ -967,7 +972,7 @@ function buildCard(m,today){
     ${m.notes?`<div class="notes-row">💬 ${esc(m.notes.substring(0,80))}${m.notes.length>80?'…':''}</div>`:''}
   </div>
   <div class="card-footer">
-    <a href="https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}" target="_blank" rel="noopener" class="btn btn-wa" onclick="onWA('${sid}')">💬 WhatsApp</a>
+    <a href="javascript:openWhatsApp('${m.phone}','${sid}',event)" class="btn btn-wa">💬 WhatsApp</a>
     <a href="tel:+91${m.phone}" class="btn btn-call" onclick="onCall('${sid}')">📞 Call</a>
     <button class="btn btn-rekart btn-sm" onclick="openRekart('${m.phone}')"><span class="rk-desktop">🔍 Rekart</span><span class="rk-mobile">📋 Copy No.</span></button>
     <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openStatus('${sid}',null)">✏️ Update</button>
@@ -984,6 +989,40 @@ function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().
 function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
 function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
 function copyPhone(phone){navigator.clipboard.writeText(phone).then(()=>toast('Phone copied: '+phone,'ok')).catch(()=>toast('Copy failed','err'));}
+
+// ═══════════════════════════════════════════
+// WHATSAPP APP SELECTION
+// ═══════════════════════════════════════════
+const WA_APP_KEY='nosh7_wa_app';
+function buildWhatsAppLink(phone,msg){
+  const app=localStorage.getItem(WA_APP_KEY)||'personal';
+  const link=encodeURIComponent(msg);
+  if(app==='business'){
+    return `whatsappbusiness://send?phone=91${phone}&text=${link}`;
+  }
+  return `https://wa.me/91${phone}?text=${link}`;
+}
+function openWhatsApp(phone,sid,event){
+  if(event) event.preventDefault();
+  const m=findM(sid);if(!m)return;
+  m.lastContacted=new Date().toISOString();
+  m.lastMethod='WhatsApp';
+  save();
+  pendingContact={sid,method:'WhatsApp'};
+  localStorage.setItem(PK,JSON.stringify(pendingContact));
+  const link=buildWhatsAppLink(phone,buildWAMsg(m));
+  window.open(link,'_blank');
+}
+function saveWAAppChoice(){
+  const val=document.getElementById('waAppSelect').value;
+  localStorage.setItem(WA_APP_KEY,val);
+  toast('WhatsApp app set to: '+(val==='business'?'Business':'Personal'),'ok');
+}
+function loadWAAppChoice(){
+  const val=localStorage.getItem(WA_APP_KEY)||'personal';
+  const sel=document.getElementById('waAppSelect');
+  if(sel) sel.value=val;
+}
 // ═══════════════════════════════════════════
 // REKART TOKEN SETTINGS
 // ═══════════════════════════════════════════
@@ -1170,7 +1209,8 @@ function bulkWhatsApp() {
   if(!toContact.length){toast('No selected members in current view','err');return;}
   toContact.forEach((m,i)=>{
     setTimeout(()=>{
-      window.open(`https://wa.me/91${m.phone}?text=${encodeURIComponent(buildWAMsg(m))}`,'_blank');
+      const link=buildWhatsAppLink(m.phone,buildWAMsg(m));
+      window.open(link,'_blank');
     },i*700);
   });
   toast(`Opening WhatsApp for ${toContact.length} members…`,'ok');
