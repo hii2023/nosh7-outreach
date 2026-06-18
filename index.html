@@ -292,12 +292,25 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   <!-- REKART TOKEN -->
   <div class="panel" style="margin-top:8px">
     <div class="panel-hdr" onclick="toggleRkPanel()">
-      <h3>🔍 Rekart Token &nbsp;<span id="rkIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
-      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveRkToken()">Save</button>
+      <h3>🔍 Rekart Integration &nbsp;<span id="rkIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
     </div>
     <div class="panel-body" id="rkBody" style="display:none;padding:10px 14px">
-      <input id="rkToken" type="password" placeholder="Paste your Rekart token here…" style="width:100%;padding:8px 10px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:monospace;box-sizing:border-box">
-      <div class="hints" style="margin-top:8px">Get it once from Rekart → open any page → browser console (F12) → paste: <code>JSON.parse(localStorage.userData).user.token</code></div>
+      <div style="margin-bottom:12px">
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();window.open('https://app.rekart.io','_blank')" style="width:100%;justify-content:center;margin-bottom:8px">Open Rekart App</button>
+        <div class="hints">Opens Rekart in a new tab. Log in if needed.</div>
+      </div>
+      <div style="border-top:1px solid var(--gray-200);padding-top:12px">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Your Token</label>
+        <input id="rkToken" type="password" placeholder="Paste token here…" style="width:100%;padding:8px 10px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:monospace;box-sizing:border-box;margin-bottom:8px">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveRkToken()" style="width:100%;justify-content:center">Save Token</button>
+        <div class="hints" style="margin-top:10px;line-height:1.7">
+          <strong>How to get token:</strong><br>
+          1. In Rekart, press <code>F12</code> to open console<br>
+          2. Paste: <code style="display:block;background:var(--gray-100);padding:6px;margin:6px 0;border-radius:4px;overflow:auto">JSON.parse(localStorage.userData).user.token</code><br>
+          3. Copy the token shown (long text in quotes)<br>
+          4. Paste it above and click Save
+        </div>
+      </div>
     </div>
   </div>
 
@@ -939,7 +952,7 @@ function buildCard(m,today){
 <div class="card s-${sc}">
   <div class="card-hdr">
     <input type="checkbox" id="cb_${sid}" class="member-cb" ${selectedMembers.has(sid)?'checked':''} onclick="event.stopPropagation();toggleSelect('${sid}')">
-    <div style="flex:1"><div class="card-name" onclick="openRekart('${m.phone}')">${esc(m.name)}</div><div class="card-mob">📱 ${m.phone}${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
+    <div style="flex:1"><div class="card-name" onclick="openRekart('${m.phone}')">${esc(m.name)}</div><div class="card-mob" style="display:flex;align-items:center;gap:6px">📱 ${m.phone} <button class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:11px;border-color:#cbd5e1" onclick="event.stopPropagation();copyPhone('${m.phone}')">Copy</button>${m.lastContacted?' · '+fmtDate(m.lastContacted):''}</div></div>
     <span class="sbadge b-${sc}">${m.status}</span>
   </div>
   <div class="card-body">
@@ -964,6 +977,7 @@ function onWA(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().to
 function onCall(sid){const m=findM(sid);if(!m)return;m.lastContacted=new Date().toISOString();m.lastMethod='Call';save();pendingContact={sid,method:'Call'};localStorage.setItem(PK,JSON.stringify(pendingContact));setTimeout(triggerModal,1200);}
 function triggerModal(){if(!pendingContact)return;const m=findM(pendingContact.sid);if(!m){clearPending();return;}openStatus(pendingContact.sid,pendingContact.method);}
 function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
+function copyPhone(phone){navigator.clipboard.writeText(phone).then(()=>toast('Phone copied: '+phone,'ok')).catch(()=>toast('Copy failed','err'));}
 // ═══════════════════════════════════════════
 // REKART TOKEN SETTINGS
 // ═══════════════════════════════════════════
