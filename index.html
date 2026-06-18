@@ -679,9 +679,21 @@ function smartFilter(list) {
   const out=[];
   for(const g of Object.values(byPhone)){
     const hasLive=g.some(m=>LIVE_RE.test(m.csvStatus));
-    g.forEach(m=>{if(hasLive&&(parseFloat(m.price)||0)<2) return; out.push(m);});
+    // 1) drop cheap add-ons (price < 2) when this customer has a live plan
+    let kept=g.filter(m=>!(hasLive&&(parseFloat(m.price)||0)<2));
+    if(!kept.length) kept=g; // never drop a customer entirely
+    // 2) collapse to ONE plan per customer: the one with the MOST units remaining
+    //    (keeps the active plan visible even if another plan shows 0 left)
+    const best=kept.reduce((a,b)=>planRank(b)>planRank(a)?b:a);
+    out.push(best);
   }
   return out;
+}
+// Rank a plan record so the "best" plan per customer wins the collapse:
+//   1) most deliveries remaining  2) live status  3) bigger plan quota
+function planRank(m){
+  const rem=parseFloat(m.remaining);
+  return (isNaN(rem)?-1:rem)*1e6 + (LIVE_RE.test(m.csvStatus)?1e3:0) + (parseFloat(m.planQuota)||0);
 }
 
 // ═══════════════════════════════════════════
