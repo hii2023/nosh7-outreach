@@ -510,7 +510,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (!error && data?.members?.length) {
       members = mergeMembers(members, data.members);
       saveLocal();
-      if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
+      if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); setDefaultFilters(); }
     }
     setSyncStatus('live', 'Live');
   } catch(e) {
@@ -862,6 +862,30 @@ function resetAllFilters() {
   document.getElementById('fSearch').value = '';
   document.getElementById('fLdFrom').value = '';
   document.getElementById('fLdTo').value = '';
+  buildQuotaChips();
+  renderDashboard();
+  renderCards();
+}
+
+function setDefaultFilters() {
+  // Default view: 0 units, Pending status, last 7 days delivery
+  activeFilter = 0; // zero units
+  activeDashKpi = 'zero';
+  document.getElementById('fStatus').value = 'Pending';
+  document.getElementById('fPlan').value = '';
+  document.getElementById('fArea').value = '';
+  document.getElementById('fFollowup').value = '';
+  document.getElementById('fSearch').value = '';
+
+  // Set date range to last 7 days
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const formatDate = (d) => d.toISOString().split('T')[0];
+  document.getElementById('fLdFrom').value = formatDate(sevenDaysAgo);
+  document.getElementById('fLdTo').value = formatDate(today);
+
   buildQuotaChips();
   renderDashboard();
   renderCards();
