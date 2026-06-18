@@ -265,24 +265,27 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 <!-- MAIN -->
 <div class="main" id="mainContent" style="display:none">
 
-  <!-- TEMPLATE -->
+  <!-- TEMPLATE INFO -->
   <div class="panel">
-    <div class="panel-hdr" onclick="togglePanel()">
-      <h3>💬 WhatsApp Template &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
-      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveTemplate()">Save</button>
+    <div class="panel-hdr" onclick="togglePanel()" style="cursor:pointer">
+      <h3>💬 WhatsApp Message &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
     </div>
-    <div class="panel-body" id="tplBody" style="display:none">
-      <textarea id="waTemplate">Hello {name}! 👋
-
-Your NOSH7 subscription ({plan}) has {units} deliveries remaining.
-
-We'd love to keep your healthy meals coming! 🥗
-
-Reply YES to renew, or we can call you to discuss the best plan.
-
-Team NOSH7 🌱
-+91 89051 96948</textarea>
-      <div class="hints">Variables: <code>{name}</code> <code>{phone}</code> <code>{plan}</code> <code>{units}</code> <code>{product}</code> <code>{price}</code> <code>{area}</code> <code>{slot}</code></div>
+    <div class="panel-body" id="tplBody" style="display:none;font-size:13px;line-height:1.6;color:var(--gray-600)">
+      <strong>Auto-selected templates (random each time):</strong>
+      <br><br>
+      <strong style="color:var(--red)">When Remaining = 0:</strong>
+      <ul style="margin:8px 0 8px 20px">
+        <li>Your subscription has ended. How was the experience? What would make you continue this plan or achieve your goal through it? Please share your suggestions.</li>
+        <li>Your subscription period has ended. How was it for you? What would help you renew or reach your wellness goals? Your feedback matters to us.</li>
+        <li>Your plan has expired. We'd like your thoughts on the experience. What would encourage you to continue or achieve your goals with us? Please share.</li>
+      </ul>
+      <strong style="color:var(--orange)">When Remaining &gt; 0:</strong>
+      <ul style="margin:8px 0 8px 20px">
+        <li>Your subscription will end soon. How has the experience been? What would make you continue this plan or achieve your goal through it? Please share your suggestions.</li>
+        <li>Your plan is expiring soon. How are you liking it? What would help you renew or reach your wellness goals? We'd value your feedback.</li>
+        <li>Your subscription is about to expire. What's your experience so far? What would encourage you to continue or achieve your goals with us? Please share your thoughts.</li>
+      </ul>
+      <div class="hints" style="margin-top:12px;color:var(--gray-500)">Note: Hi + first name only. No signature. No emojis or symbols.</div>
     </div>
   </div>
 
@@ -470,7 +473,6 @@ let _pushing          = false;
 window.addEventListener('DOMContentLoaded', async () => {
   // 1. Load from local cache immediately (instant UI)
   members = loadLocal();
-  loadTemplate();
   loadRkToken();
   try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
 
@@ -1043,13 +1045,27 @@ function saveStatus(){
 document.getElementById('statusModal').addEventListener('click',function(e){if(e.target===this)closeStatus();});
 
 // ═══════════════════════════════════════════
-// TEMPLATE
+// TEMPLATE — auto random selection
 // ═══════════════════════════════════════════
-function loadTemplate(){const s=localStorage.getItem(TK);if(s)document.getElementById('waTemplate').value=s;}
-function saveTemplate(){localStorage.setItem(TK,document.getElementById('waTemplate').value);toast('Template saved ✅','ok');}
+const WA_TEMPLATES={
+  zero:[
+    'Hi {name}, your subscription has ended. How was the experience? What would make you continue this plan or achieve your goal through it? Please share your suggestions.',
+    'Hi {name}, your subscription period has ended. How was it for you? What would help you renew or reach your wellness goals? Your feedback matters to us.',
+    'Hi {name}, your plan has expired. We would like your thoughts on the experience. What would encourage you to continue or achieve your goals with us? Please share.'
+  ],
+  active:[
+    'Hi {name}, your subscription will end soon. How has the experience been? What would make you continue this plan or achieve your goal through it? Please share your suggestions.',
+    'Hi {name}, your plan is expiring soon. How are you liking it? What would help you renew or reach your wellness goals? We would value your feedback.',
+    'Hi {name}, your subscription is about to expire. What is your experience so far? What would encourage you to continue or achieve your goals with us? Please share your thoughts.'
+  ]
+};
 function buildWAMsg(m){
-  return(document.getElementById('waTemplate').value||'Hello {name}!')
-    .replace(/{name}/g,m.name||'').replace(/{phone}/g,m.phone||'')
+  const rem=parseFloat(m.remaining)||0;
+  const templates=rem===0?WA_TEMPLATES.zero:WA_TEMPLATES.active;
+  const tpl=templates[Math.floor(Math.random()*templates.length)];
+  const firstName=(m.name||'').split(' ')[0];
+  return tpl
+    .replace(/{name}/g,firstName).replace(/{phone}/g,m.phone||'')
     .replace(/{plan}/g,m.planName||'').replace(/{units}/g,m.remaining||'0')
     .replace(/{product}/g,m.product||'').replace(/{price}/g,m.price?'₹'+m.price:'')
     .replace(/{area}/g,m.area||'').replace(/{slot}/g,m.slot||'');
