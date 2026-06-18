@@ -241,9 +241,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   </div>
   <div class="header-right">
     <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
-    <select id="waAppSelect" onchange="saveWAAppChoice()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 9px;font-size:12px;font-weight:600;cursor:pointer;height:32px">
+    <select id="waAppSelect" onchange="saveWAAppChoice()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 9px;font-size:12px;font-weight:600;cursor:pointer;height:32px" title="WhatsApp Business only works on mobile Android">
       <option value="personal">WhatsApp</option>
-      <option value="business">Business</option>
+      <option value="business" id="waBusinessOpt">Business (Android only)</option>
     </select>
     <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆<span class="btn-label"> Add New</span></button>
     <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄<span class="btn-label"> Refresh</span></button>
@@ -1035,9 +1035,22 @@ function saveWAAppChoice(){
   toast('WhatsApp app set to: '+(val==='business'?'Business':'Personal'),'ok');
 }
 function loadWAAppChoice(){
-  const val=localStorage.getItem(WA_APP_KEY)||'personal';
+  const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
   const sel=document.getElementById('waAppSelect');
-  if(sel) sel.value=val;
+  const opt=document.getElementById('waBusinessOpt');
+
+  // Disable Business option on web/desktop
+  if(!isMob && opt) opt.disabled=true;
+
+  const val=localStorage.getItem(WA_APP_KEY)||'personal';
+  if(sel){
+    sel.value=val;
+    // Force Personal on web if Business was selected
+    if(!isMob && val==='business'){
+      sel.value='personal';
+      localStorage.setItem(WA_APP_KEY,'personal');
+    }
+  }
 }
 // ═══════════════════════════════════════════
 // REKART TOKEN SETTINGS
