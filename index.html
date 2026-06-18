@@ -681,16 +681,31 @@ function smartFilter(list) {
     const hasLive=g.some(m=>LIVE_RE.test(m.csvStatus));
     // 1) drop cheap add-ons (price < 2) when this customer has a live plan
     let kept=g.filter(m=>!(hasLive&&(parseFloat(m.price)||0)<2));
-    if(!kept.length) kept=g; // never drop a customer entirely
+    if(!kept.length) kept=g;
 
-    // 2) if customer has ANY plan with units > 0, discard ALL zero-unit plans
-    //    (so Plan A=0 + Plan B=15 shows only Plan B, not blocked by Plan A)
-    const nonZeroPlans=kept.filter(m=>(parseFloat(m.remaining)||0)>0);
-    if(nonZeroPlans.length>0) kept=nonZeroPlans;
+    // 2) if any plan is ACTIVE and has units > 0, hide all zero-unit plans
+    const hasActiveWithUnits=kept.some(m=>LIVE_RE.test(m.csvStatus)&&(parseFloat(m.remaining)||0)>0);
+    if(hasActiveWithUnits){
+      kept=kept.filter(m=>(parseFloat(m.remaining)||0)>0);
+    } else {
+      // if all plans are zero, keep only the one with most recent last delivery date
+      const zeroPlans=kept.filter(m=>(parseFloat(m.remaining)||0)===0);
+      if(zeroPlans.length>1){
+        kept=[zeroPlans.reduce((a,b)=>{
+          const dateA=parseDate(a.lastDelivery)||new Date(0);
+          const dateB=parseDate(b.lastDelivery)||new Date(0);
+          return dateB>dateA?b:a;
+        })];
+      } else if(zeroPlans.length>0) {
+        kept=zeroPlans;
+      }
+    }
 
     // 3) collapse to ONE plan per customer: the one with the MOST units remaining
-    const best=kept.reduce((a,b)=>planRank(b)>planRank(a)?b:a);
-    out.push(best);
+    if(kept.length>0){
+      const best=kept.reduce((a,b)=>planRank(b)>planRank(a)?b:a);
+      out.push(best);
+    }
   }
   return out;
 }
