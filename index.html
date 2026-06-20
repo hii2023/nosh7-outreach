@@ -240,10 +240,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
     <div class="sub" id="headerSub">Connecting…</div>
   </div>
   <div class="header-right">
-    <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
+    <div class="sync-dot" id="syncDot" onclick="pullFromCloud()" style="cursor:pointer" title="Tap to refresh data now"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
     <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆<span class="btn-label"> Add New</span></button>
     <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄<span class="btn-label"> Refresh</span></button>
-    <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
+    <input type="file" id="fileInput" accept=".csv,text/csv,text/comma-separated-values,application/csv,application/vnd.ms-excel,text/plain,.txt" onchange="handleFileUpload(event)" style="display:none">
     <button class="btn btn-ghost" onclick="confirmClear()" title="Clear data">🗑</button>
   </div>
 </div>
@@ -497,28 +497,46 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
 
-  setSyncStatus('syncing', 'Syncing…');
-
   // 2. Pull latest from cloud and merge
+  await pullFromCloud(true);
+
+  // 3. Subscribe to realtime changes
+  subscribeRealtime();
+
+  // 4. Visibility / focus events: re-pull data + handle pending contact
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      pullFromCloud();                       // refresh data when returning to tab (mobile fix)
+      resubscribeRealtime();                 // reconnect dropped realtime socket
+      if (pendingContact) setTimeout(triggerModal,400);
+    }
+  });
+  window.addEventListener('focus', () => {
+    pullFromCloud();
+    if (pendingContact) setTimeout(triggerModal,400);
+  });
+});
+
+// ═══════════════════════════════════════════
+// CLOUD PULL — fetch latest from Supabase and merge
+// ═══════════════════════════════════════════
+async function pullFromCloud(isFirstLoad) {
+  setSyncStatus('syncing', 'Syncing…');
   try {
     const { data, error } = await sb.from('nosh7_sessions').select('members').eq('id', SESSION).maybeSingle();
     if (!error && data?.members?.length) {
       members = mergeMembers(members, data.members);
       saveLocal();
-      if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); setDefaultFilters(); }
+      if (members.length > 0) {
+        showMain(); populateDropdowns(); renderAll();
+        if (isFirstLoad) setDefaultFilters();
+      }
     }
     setSyncStatus('live', 'Live');
   } catch(e) {
     setSyncStatus('offline', 'Offline');
   }
-
-  // 3. Subscribe to realtime changes
-  subscribeRealtime();
-
-  // 4. Visibility / focus events for pending contact
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && pendingContact) setTimeout(triggerModal,400); });
-  window.addEventListener('focus', () => { if (pendingContact) setTimeout(triggerModal,400); });
-});
+}
 
 // ═══════════════════════════════════════════
 // SYNC STATUS INDICATOR
@@ -533,8 +551,9 @@ function setSyncStatus(state, label) {
 // ═══════════════════════════════════════════
 // REALTIME SUBSCRIPTION
 // ═══════════════════════════════════════════
+let _rtChannel = null;
 function subscribeRealtime() {
-  sb.channel('nosh7_rt')
+  _rtChannel = sb.channel('nosh7_rt')
     .on('postgres_changes', {
       event: '*', schema: 'public', table: 'nosh7_sessions',
       filter: `id=eq.${SESSION}`
@@ -554,6 +573,13 @@ function subscribeRealtime() {
       if (status === 'CLOSED')        setSyncStatus('offline', 'Offline');
       if (status === 'CHANNEL_ERROR') setSyncStatus('offline', 'Offline');
     });
+}
+// Reconnect realtime if the socket was dropped (mobile backgrounding kills it)
+function resubscribeRealtime() {
+  const state = _rtChannel && _rtChannel.state;
+  if (state === 'joined' || state === 'joining') return; // still connected
+  try { if (_rtChannel) sb.removeChannel(_rtChannel); } catch(e) {}
+  subscribeRealtime();
 }
 
 // ═══════════════════════════════════════════
