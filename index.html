@@ -241,10 +241,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   </div>
   <div class="header-right">
     <div class="sync-dot" id="syncDot"><div class="dot"></div><span id="syncLabel">Connecting</span></div>
-    <select id="waAppSelect" onchange="saveWAAppChoice()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 9px;font-size:12px;font-weight:600;cursor:pointer;height:32px" title="WhatsApp Business only works on mobile Android">
-      <option value="personal">WhatsApp</option>
-      <option value="business" id="waBusinessOpt">Business (Android only)</option>
-    </select>
     <button class="btn btn-ghost" onclick="uploadMode='add';document.getElementById('fileInput').click()">⬆<span class="btn-label"> Add New</span></button>
     <button class="btn btn-ghost" onclick="uploadMode='refresh';document.getElementById('fileInput').click()" title="Update quotas for existing members from new CSV">🔄<span class="btn-label"> Refresh</span></button>
     <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)" style="display:none">
@@ -497,7 +493,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Load from local cache immediately (instant UI)
   members = loadLocal();
   loadRkToken();
-  loadWAAppChoice();
   try { pendingContact = JSON.parse(localStorage.getItem(PK)||'null'); } catch {}
 
   if (members.length > 0) { showMain(); populateDropdowns(); renderAll(); }
@@ -1022,25 +1017,10 @@ function clearPending(){pendingContact=null;localStorage.removeItem(PK);}
 function copyPhone(phone){navigator.clipboard.writeText(phone).then(()=>toast('Phone copied: '+phone,'ok')).catch(()=>toast('Copy failed','err'));}
 
 // ═══════════════════════════════════════════
-// WHATSAPP APP SELECTION
+// WHATSAPP MESSAGING
 // ═══════════════════════════════════════════
-const WA_APP_KEY='nosh7_wa_app';
 function buildWhatsAppLink(phone,msg){
-  const app=localStorage.getItem(WA_APP_KEY)||'personal';
-  const link=encodeURIComponent(msg);
-  const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-
-  if(app==='business'){
-    if(isMob){
-      // Mobile: try WhatsApp Business deep link
-      return `intent://send?phone=91${phone}&text=${link}#Intent;scheme=whatsappbusiness;package=com.whatsapp.w4b;end`;
-    } else {
-      // Web: WhatsApp Business not available via deep link, use regular wa.me with note
-      toast('Business option works on mobile. Using standard WhatsApp on web.','');
-      return `https://wa.me/91${phone}?text=${link}`;
-    }
-  }
-  return `https://wa.me/91${phone}?text=${link}`;
+  return `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
 }
 function openWhatsApp(phone,sid,event){
   if(event) event.preventDefault();
@@ -1053,29 +1033,6 @@ function openWhatsApp(phone,sid,event){
   const link=buildWhatsAppLink(phone,buildWAMsg(m));
   window.open(link,'_blank');
 }
-function saveWAAppChoice(){
-  const val=document.getElementById('waAppSelect').value;
-  localStorage.setItem(WA_APP_KEY,val);
-  toast('WhatsApp app set to: '+(val==='business'?'Business':'Personal'),'ok');
-}
-function loadWAAppChoice(){
-  const isMob=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const sel=document.getElementById('waAppSelect');
-  const opt=document.getElementById('waBusinessOpt');
-
-  // Disable Business option on web/desktop
-  if(!isMob && opt) opt.disabled=true;
-
-  const val=localStorage.getItem(WA_APP_KEY)||'personal';
-  if(sel){
-    sel.value=val;
-    // Force Personal on web if Business was selected
-    if(!isMob && val==='business'){
-      sel.value='personal';
-      localStorage.setItem(WA_APP_KEY,'personal');
-    }
-  }
-}
 // ═══════════════════════════════════════════
 // REKART TOKEN SETTINGS
 // ═══════════════════════════════════════════
@@ -1085,51 +1042,44 @@ function saveRkToken(){const t=document.getElementById('rkToken').value.trim();i
 function loadRkToken(){const t=localStorage.getItem(RK_KEY);if(t&&document.getElementById('rkToken'))document.getElementById('rkToken').value=t;}
 
 async function openRekart(phone){
-  // On mobile — copy phone number to clipboard (can't use Rekart console on mobile)
-  const isMob = window.innerWidth <= 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  if(isMob){
-    try {
-      await navigator.clipboard.writeText(phone);
-      toast('📋 Copied: '+phone,'ok');
-    } catch(e) {
-      // Fallback for browsers that block clipboard without HTTPS or user gesture
-      const inp = document.createElement('input');
-      inp.value = phone;
-      inp.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-      document.body.appendChild(inp);
-      inp.focus(); inp.select();
-      try { document.execCommand('copy'); toast('📋 Copied: '+phone,'ok'); }
-      catch(e2) { toast('📱 Phone: '+phone,''); }
-      document.body.removeChild(inp);
-    }
-    return;
-  }
-  // Desktop — token-based Rekart lookup
-  const token = localStorage.getItem(RK_KEY);
-  if(!token){
-    document.getElementById('rkBody').style.display='block';
-    document.getElementById('rkIcon').textContent='▲ collapse';
-    document.getElementById('rkToken').focus();
-    toast('Save your Rekart token first 👆','err');
-    return;
-  }
-  toast('🔍 Looking up '+phone+'…','');
+  // Copy phone number to clipboard (works on all devices)
   try {
-    const res = await fetch(SB_URL+'/functions/v1/rekart-search',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({phone, token})
-    });
-    const data = await res.json();
-    if(data.id){
-      window.open('https://app.rekart.io/app/main/customers/'+data.id+'/profile','_blank','noopener');
-    } else {
-      toast('Customer not found in Rekart','err');
-      window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
+    await navigator.clipboard.writeText(phone);
+    toast('Phone copied: '+phone+' · Open Rekart and search','ok');
+  } catch(e) {
+    // Fallback for browsers that block clipboard
+    const inp = document.createElement('input');
+    inp.value = phone;
+    inp.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(inp);
+    inp.focus(); inp.select();
+    try {
+      document.execCommand('copy');
+      toast('Phone copied: '+phone+' · Open Rekart and search','ok');
     }
-  } catch(e){
-    toast('Rekart lookup failed','err');
-    window.open('https://app.rekart.io/app/main/overview','_blank','noopener');
+    catch(e2) {
+      toast('Phone: '+phone+' · Copy manually or search in Rekart','');
+    }
+    document.body.removeChild(inp);
+  }
+
+  // Also try to open Rekart app if available
+  const token = localStorage.getItem(RK_KEY);
+  if(token){
+    // Token is saved, try to lookup customer
+    try {
+      const res = await fetch(SB_URL+'/functions/v1/rekart-search',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone, token})
+      });
+      const data = await res.json();
+      if(data.id){
+        setTimeout(()=>window.open('https://app.rekart.io/app/main/customers/'+data.id+'/profile','_blank'),500);
+      }
+    } catch(e){
+      // Silently fail, user can search manually
+    }
   }
 }
 
