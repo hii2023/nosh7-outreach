@@ -809,7 +809,7 @@ function renderDashboard() {
   const active=list.filter(m=>(parseFloat(m.remaining)||0)>0);
   const totalPending=active.reduce((s,m)=>s+(parseFloat(m.remaining)||0),0);
   const sc={};
-  members.forEach(m=>sc[m.status]=(sc[m.status]||0)+1);
+  list.forEach(m=>sc[m.status]=(sc[m.status]||0)+1); // deduped, so counts match clickable card view
   const zeroCount=list.filter(m=>(parseFloat(m.remaining)||0)===0).length;
   const todayD=new Date(); todayD.setHours(0,0,0,0);
   const in7=new Date(todayD); in7.setDate(in7.getDate()+7);
@@ -822,7 +822,7 @@ function renderDashboard() {
     <div class="dash-kpi purple clickable${activeDashKpi==='converted'?' active-kpi':''}" onclick="dashFilterBy('status','Converted')"><div class="kpi-num">${sc['Converted']||0}</div><div class="kpi-label">✅ Renewed</div></div>
     <div class="dash-kpi red clickable${activeDashKpi==='zero'?' active-kpi':''}" onclick="dashFilterBy('quota','zero')"><div class="kpi-num">${zeroCount}</div><div class="kpi-label">🔴 Zero Remaining</div></div>
     <div class="dash-kpi amber clickable${activeDashKpi==='expiring'?' active-kpi':''}" onclick="dashFilterBy('expiring','expiring')"><div class="kpi-num">${expiringCount}</div><div class="kpi-label">⏳ Expiring in 7d</div></div>
-    <div class="dash-kpi clickable${activeDashKpi==='all'?' active-kpi':''}" onclick="dashFilterBy('all','all')"><div class="kpi-num">${members.length}</div><div class="kpi-label">👥 Total Members</div></div>
+    <div class="dash-kpi clickable${activeDashKpi==='all'?' active-kpi':''}" onclick="dashFilterBy('all','all')"><div class="kpi-num">${list.length}</div><div class="kpi-label">👥 Total Members</div></div>
   `;
 
   const byRoute={};
@@ -1185,8 +1185,9 @@ function showMain(){
   updateHeader();
 }
 function updateHeader(){
-  const active=smartFilter(members).filter(m=>(parseFloat(m.remaining)||0)>0).length;
-  document.getElementById('headerSub').textContent=`${members.length} members · ${active} active`;
+  const list=smartFilter(members);
+  const active=list.filter(m=>(parseFloat(m.remaining)||0)>0).length;
+  document.getElementById('headerSub').textContent=`${list.length} members · ${active} active`;
 }
 function confirmClear(){
   if(!confirm('Delete ALL data on all devices? This cannot be undone.')) return;
