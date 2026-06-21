@@ -265,94 +265,41 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 <!-- MAIN -->
 <div class="main" id="mainContent" style="display:none">
 
-  <!-- TEMPLATE INFO -->
-  <div class="panel">
-    <div class="panel-hdr" onclick="togglePanel()" style="cursor:pointer">
-      <h3>💬 WhatsApp Message &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
+  <!-- ═══ DASHBOARD (collapsible) ═══ -->
+  <div class="dash-section" style="margin-bottom:14px">
+    <div class="dash-section-hdr" onclick="toggleDashboard()" style="justify-content:space-between">
+      <span>📊 Dashboard <span style="font-weight:400;font-size:11px;color:var(--gray-400)">— tap a number to filter</span></span>
+      <span id="dashToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
     </div>
-    <div class="panel-body" id="tplBody" style="display:none;font-size:12px;line-height:1.7;color:var(--gray-600)">
-      <strong>Auto-selected templates (random each time):</strong>
-      <br><br>
-      <strong style="color:var(--red)">When Remaining = 0 (6 templates):</strong>
-      <div style="margin:8px 0 8px 16px;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">
-Hi {name}, your subscription has ended.
-We miss you and want to help with your food experience.
-How were the meals? What would make you continue?
-Type YES to renew.
-      </div>
-      <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
-      <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 (6 templates):</strong>
-      <div style="margin:8px 0 8px 16px;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--orange);white-space:pre-wrap;font-family:monospace;font-size:11px">
-Hi {name}, your subscription is ending soon.
-We want to help you continue your food and wellness journey.
-How is your experience? What would make you renew?
-Type YES to continue.
-      </div>
-      <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
-      <div class="hints" style="margin-top:14px;color:var(--gray-500);padding:10px;background:var(--gray-50);border-radius:6px">
-        <strong>Format:</strong> Name on first line • Multi-line for readability • Tone: helping with food experience • Type YES to continue • No signature, no emojis
-      </div>
-    </div>
-  </div>
 
-  <!-- REKART TOKEN -->
-  <div class="panel" style="margin-top:8px">
-    <div class="panel-hdr" onclick="toggleRkPanel()">
-      <h3>🔍 Rekart Integration &nbsp;<span id="rkIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
-    </div>
-    <div class="panel-body" id="rkBody" style="display:none;padding:10px 14px">
-      <div style="margin-bottom:12px">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();window.open('https://app.rekart.io','_blank')" style="width:100%;justify-content:center;margin-bottom:8px">Open Rekart App</button>
-        <div class="hints">Opens Rekart in a new tab. Log in if needed.</div>
-      </div>
-      <div style="border-top:1px solid var(--gray-200);padding-top:12px">
-        <label style="display:block;font-size:11px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Your Token</label>
-        <input id="rkToken" type="password" placeholder="Paste token here…" style="width:100%;padding:8px 10px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:monospace;box-sizing:border-box;margin-bottom:8px">
-        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveRkToken()" style="width:100%;justify-content:center">Save Token</button>
-        <div class="hints" style="margin-top:10px;line-height:1.7">
-          <strong>How to get token:</strong><br>
-          1. In Rekart, press <code>F12</code> to open console<br>
-          2. Paste: <code style="display:block;background:var(--gray-100);padding:6px;margin:6px 0;border-radius:4px;overflow:auto">JSON.parse(localStorage.userData).user.token</code><br>
-          3. Copy the token shown (long text in quotes)<br>
-          4. Paste it above and click Save
+    <div id="dashBody" style="display:none">
+      <!-- KPI GRID -->
+      <div id="dashKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--gray-100)"></div>
+
+      <!-- BATCH TABLE -->
+      <div style="border-top:1px solid var(--gray-200)">
+        <div class="dash-section-hdr" onclick="event.stopPropagation();toggleBatch()" style="border-top:none">
+          📦 Active by Batch / Route
+          <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
+        </div>
+        <div id="batchBody" style="display:none">
+          <table class="batch-table">
+            <thead><tr><th>Route / Batch</th><th>Active</th><th>Pending Deliveries</th><th>Avg Left</th><th>Share</th></tr></thead>
+            <tbody id="batchRows"></tbody>
+          </table>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ═══ DASHBOARD ═══ -->
-  <div class="dash-section" style="margin-bottom:14px">
-    <div class="dash-section-hdr" style="cursor:default;justify-content:flex-start;gap:10px">
-      📊 Dashboard
-      <span style="font-weight:400;font-size:11px;color:var(--gray-400)">Click any number to filter members below</span>
-    </div>
-
-    <!-- KPI GRID -->
-    <div id="dashKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--gray-100)"></div>
-
-    <!-- BATCH TABLE -->
-    <div style="border-top:1px solid var(--gray-200)">
-      <div class="dash-section-hdr" onclick="toggleBatch()" style="border-top:none">
-        📦 Active by Batch / Route
-        <span id="batchToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
+      <!-- DELIVERY FILTER (hidden by default) -->
+      <div style="border-top:1px solid var(--gray-200);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();toggleQuotaFilter()" id="quotaToggleBtn"
+          style="border-color:var(--brand);color:var(--brand);font-size:12px">▼ Show Delivery Count Filter</button>
+        <span id="qbHint" style="font-size:12px;color:var(--gray-500);font-weight:500"></span>
       </div>
-      <div id="batchBody" style="display:none">
-        <table class="batch-table">
-          <thead><tr><th>Route / Batch</th><th>Active</th><th>Pending Deliveries</th><th>Avg Left</th><th>Share</th></tr></thead>
-          <tbody id="batchRows"></tbody>
-        </table>
+      <div id="quotaBanner" style="display:none;padding:12px 14px;background:linear-gradient(135deg,#15803d,#16a34a);border-radius:0 0 12px 12px">
+        <div style="color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px">Click a count to show matching members</div>
+        <div class="quota-chips" id="quotaChips"></div>
       </div>
-    </div>
-
-    <!-- DELIVERY FILTER (hidden by default) -->
-    <div style="border-top:1px solid var(--gray-200);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-outline btn-sm" onclick="toggleQuotaFilter()" id="quotaToggleBtn"
-        style="border-color:var(--brand);color:var(--brand);font-size:12px">▼ Show Delivery Count Filter</button>
-      <span id="qbHint" style="font-size:12px;color:var(--gray-500);font-weight:500"></span>
-    </div>
-    <div id="quotaBanner" style="display:none;padding:12px 14px;background:linear-gradient(135deg,#15803d,#16a34a);border-radius:0 0 12px 12px">
-      <div style="color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px">Click a count to show matching members</div>
-      <div class="quota-chips" id="quotaChips"></div>
     </div>
   </div>
 
@@ -411,6 +358,68 @@ Type YES to continue.
 
   <!-- CARDS -->
   <div class="cards-grid" id="cardsGrid"></div>
+
+  <!-- ═══ SETTINGS & TOOLS (collapsible, at bottom) ═══ -->
+  <div class="dash-section" style="margin-top:18px">
+    <div class="dash-section-hdr" onclick="toggleSettings()" style="justify-content:space-between">
+      <span>⚙️ Settings &amp; Tools <span style="font-weight:400;font-size:11px;color:var(--gray-400)">— Rekart &amp; message info</span></span>
+      <span id="settingsToggle" style="font-weight:400;font-size:12px;color:var(--gray-400)">▼ expand</span>
+    </div>
+    <div id="settingsBody" style="display:none;padding:12px">
+
+      <!-- REKART INTEGRATION -->
+      <div class="panel" style="margin:0 0 12px">
+        <div class="panel-hdr" onclick="toggleRkPanel()">
+          <h3>🔍 Rekart Integration &nbsp;<span id="rkIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
+        </div>
+        <div class="panel-body" id="rkBody" style="display:none;padding:10px 0 0">
+          <div style="margin-bottom:12px">
+            <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();window.open('https://app.rekart.io','_blank')" style="width:100%;justify-content:center;margin-bottom:8px">Open Rekart App</button>
+            <div class="hints">Opens Rekart in a new tab. Log in if needed.</div>
+          </div>
+          <div style="border-top:1px solid var(--gray-200);padding-top:12px">
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Your Token</label>
+            <input id="rkToken" type="password" placeholder="Paste token here…" style="width:100%;padding:8px 10px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:monospace;box-sizing:border-box;margin-bottom:8px">
+            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();saveRkToken()" style="width:100%;justify-content:center">Save Token</button>
+            <div class="hints" style="margin-top:10px;line-height:1.7">
+              <strong>How to get token:</strong><br>
+              1. In Rekart, press <code>F12</code> to open console<br>
+              2. Paste: <code style="display:block;background:var(--gray-100);padding:6px;margin:6px 0;border-radius:4px;overflow:auto">JSON.parse(localStorage.userData).user.token</code><br>
+              3. Copy the token shown (long text in quotes)<br>
+              4. Paste it above and click Save
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP MESSAGE INFO -->
+      <div class="panel" style="margin:0">
+        <div class="panel-hdr" onclick="togglePanel()" style="cursor:pointer">
+          <h3>💬 WhatsApp Message &nbsp;<span id="tplIcon" style="font-weight:400;color:var(--gray-400);font-size:12px">▼ expand</span></h3>
+        </div>
+        <div class="panel-body" id="tplBody" style="display:none;font-size:12px;line-height:1.7;color:var(--gray-600);padding:10px 0 0">
+          <strong>Auto-selected templates (random each time):</strong>
+          <br><br>
+          <strong style="color:var(--red)">When Remaining = 0 (6 templates):</strong>
+          <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
+
+Your subscription has ended. We miss you and want to help with your food experience. How were the meals? What would make you continue?
+Type YES to renew.</div>
+          <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
+          <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 (6 templates):</strong>
+          <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--orange);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
+
+Your subscription is ending soon. We want to help you continue your food and wellness journey. How is your experience? What would make you renew?
+Type YES to continue.</div>
+          <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
+          <div class="hints" style="margin-top:14px;color:var(--gray-500);padding:10px;background:var(--gray-50);border-radius:6px">
+            <strong>Format:</strong> Greeting + first name on line 1 • blank line 2 • message from line 3 • Type YES CTA • No signature, no emojis
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- BULK ACTION BAR -->
@@ -846,6 +855,16 @@ function renderDashboard() {
     :`<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:18px">No active customers</td></tr>`;
 }
 function toggleBatch(){batchOpen=!batchOpen;document.getElementById('batchBody').style.display=batchOpen?'':'none';document.getElementById('batchToggle').textContent=batchOpen?'▲ collapse':'▼ expand';}
+function toggleDashboard(){const b=document.getElementById('dashBody');const open=b.style.display==='none';b.style.display=open?'':'none';document.getElementById('dashToggle').textContent=open?'▲ collapse':'▼ expand';}
+function toggleSettings(){const b=document.getElementById('settingsBody');const open=b.style.display==='none';b.style.display=open?'':'none';document.getElementById('settingsToggle').textContent=open?'▲ collapse':'▼ expand';}
+// Dashboard: collapsed by default on mobile, expanded on desktop
+function applyDefaultDashboardState(){
+  const isMob=window.innerWidth<=600||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const b=document.getElementById('dashBody');const t=document.getElementById('dashToggle');
+  if(!b||!t) return;
+  if(isMob){ b.style.display='none'; t.textContent='▼ expand'; }
+  else     { b.style.display='';     t.textContent='▲ collapse'; }
+}
 
 // ═══════════════════════════════════════════
 // DASHBOARD KPI CLICK FILTERING
@@ -1179,10 +1198,12 @@ function populateDropdowns(){
 }
 function clearDates(){document.getElementById('fLdFrom').value='';document.getElementById('fLdTo').value='';renderCards();}
 
+let _dashStateApplied=false;
 function showMain(){
   document.getElementById('uploadZone').style.display='none';
   document.getElementById('mainContent').style.display='';
   updateHeader();
+  if(!_dashStateApplied){ applyDefaultDashboardState(); _dashStateApplied=true; }
 }
 function updateHeader(){
   const list=smartFilter(members);
