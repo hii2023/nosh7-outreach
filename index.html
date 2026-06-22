@@ -412,12 +412,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
           <br><br>
           The right set is auto-picked from units left and how recent the last delivery was:
           <br><br>
-          <strong style="color:var(--red)">0 units, ended within 10 days — "just finished" (6):</strong>
+          <strong style="color:var(--red)">0 units, last delivery within 5 days — "just finished" (6):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
 
 Your plan just finished and your healthy routine is still fresh. Renew now and there is no gap before your next meal arrives.
 Type YES to continue.</div>
-          <strong style="color:#7c3aed;display:block">0 units, ended a while ago — gentle restart (6):</strong>
+          <strong style="color:#7c3aed;display:block">0 units, last delivery over 5 days ago — gentle restart (6):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid #7c3aed;white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
 
 It has been a little while since your last NOSH7 meal. The healthy habit you started is worth keeping, and picking it back up is easier than starting from zero.
@@ -1247,7 +1247,7 @@ const WA_TEMPLATES={
     'Hello {name}\n\nYour plan ends shortly. Members who renew on time get the smoothest, uninterrupted delivery schedule.\nType YES to continue your plan.'
   ]
 };
-const RECENT_DAYS=10; // 0-unit member counts as "just ended" within this many days
+const RECENT_DAYS=5; // 0-unit member counts as "just ended" within this many days; older => gentle restart
 function buildWAMsg(m){
   const rem=parseFloat(m.remaining)||0;
   let templates;
