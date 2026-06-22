@@ -410,20 +410,20 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
         <div class="panel-body" id="tplBody" style="display:none;font-size:12px;line-height:1.7;color:var(--gray-600);padding:10px 0 0">
           <strong>Auto-selected templates (random each time):</strong>
           <br><br>
-          <strong style="color:var(--red)">When Remaining = 0 (6 templates):</strong>
+          <strong style="color:var(--red)">When Remaining = 0 — win-back (6 templates):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
 
-Your subscription has ended. We miss you and want to help with your food experience. How were the meals? What would make you continue?
-Type YES to renew.</div>
+You built a healthy routine with NOSH7, and it would be a shame to lose that momentum now. You can pick up right where you left off, whenever you are ready.
+Type YES and we will set it up.</div>
           <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
-          <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 (6 templates):</strong>
+          <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 — renewal nudge (6 templates):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--orange);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
 
-Your subscription is ending soon. We want to help you continue your food and wellness journey. How is your experience? What would make you renew?
+Your plan is almost done and we want to keep your meals coming without a gap. Renewing now means no break in your routine.
 Type YES to continue.</div>
           <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
           <div class="hints" style="margin-top:14px;color:var(--gray-500);padding:10px;background:var(--gray-50);border-radius:6px">
-            <strong>Format:</strong> Greeting + first name on line 1 • blank line 2 • message from line 3 • Type YES CTA • No signature, no emojis
+            <strong>Tone:</strong> confident, not needy. Psychology used: loss aversion, identity, autonomy, continuity, social proof.<br><strong>Format:</strong> greeting + first name on line 1 • blank line 2 • message from line 3 • Type YES CTA • no signature, no emojis.
           </div>
         </div>
       </div>
@@ -1211,21 +1211,25 @@ document.getElementById('statusModal').addEventListener('click',function(e){if(e
 // TEMPLATE — auto random selection
 // ═══════════════════════════════════════════
 const WA_TEMPLATES={
+  // ZERO units — lapsed / win-back. Psychology: loss aversion, identity,
+  // autonomy (no pressure), fresh-start, social proof. Confident, not needy.
   zero:[
-    'Hi {name}\n\nYour subscription has ended. We miss you and want to help you with your food experience. How were the meals? What would make you continue your wellness journey with NOSH7?\nType YES to renew.',
-    'Hello {name}\n\nYour subscription is over. We care about supporting your nutrition goals. How did you like our meals? What would encourage you to restart your healthy eating?\nType YES if interested.',
-    'Hi {name}\n\nYour plan has expired. We are here to help you achieve your food and health goals. What was your experience with us? What would help you come back?\nType YES to continue.',
-    'Hello {name}\n\nYour subscription has ended. We want to support your wellness journey. How was the meal quality? What would motivate you to renew your NOSH7 plan?\nType YES to explore options.',
-    'Hi {name}\n\nYour subscription is finished. We believe in helping you achieve your nutrition goals through quality food. How was your experience? What would make you restart?\nType YES if you are interested.',
-    'Hello {name}\n\nYour plan ended. We are committed to supporting your food and health goals. How did our meals work for you? What changes would help you continue?\nType YES to renew.'
+    'Hi {name}\n\nYou built a healthy routine with NOSH7, and it would be a shame to lose that momentum now. You can pick up right where you left off, whenever you are ready.\nType YES and we will set it up.',
+    'Hello {name}\n\nEating well was clearly a priority for you, and that goal has not changed. Many members come back sharper after a short break.\nType YES to start your next round.',
+    'Hi {name}\n\nYour plan is paused, but your goals are not. We have improved a few things since you last ordered that we think you will notice.\nType YES to see your options.',
+    'Hello {name}\n\nNo pressure at all. Whenever you want your healthy meals back, it takes one message and we handle the rest.\nType YES and you are sorted.',
+    'Hi {name}\n\nMost members who pause come back within a few weeks, because cooking healthy every day gets tiring fast. We have kept your details ready for a quick restart.\nType YES to continue.',
+    'Hello {name}\n\nQuick one. Before you continue, was there anything about the meals or service you would change? Your honest answer genuinely helps us serve you better.\nType YES to renew, or just reply with your thoughts.'
   ],
+  // ACTIVE >0 — ending soon. Psychology: continuity, avoid-the-gap,
+  // commitment/streak, effort saved, on-time benefit.
   active:[
-    'Hi {name}\n\nYour subscription is ending soon. We want to help you continue your food and wellness journey. How is your experience with the meals? What would make you renew?\nType YES to continue.',
-    'Hello {name}\n\nYour plan expires soon. We care about supporting your nutrition goals. How are the meals working for you? What would encourage you to keep going?\nType YES if interested.',
-    'Hi {name}\n\nYour subscription will end shortly. We are here to help you achieve your health goals through quality food. How has the experience been? What would make you stay with us?\nType YES to renew.',
-    'Hello {name}\n\nYour plan runs out soon. We want to support your wellness journey. How is your experience so far? What would help you continue your healthy eating goals?\nType YES to keep going.',
-    'Hi {name}\n\nYour subscription ends soon. We believe in helping you with the food experience you need. How are you liking the meals? What would motivate you to renew?\nType YES if interested.',
-    'Hello {name}\n\nYour plan expires soon. We are committed to supporting your nutrition goals. How has it been for you? What would make you want to continue your wellness journey?\nType YES to renew.'
+    'Hi {name}\n\nYour plan is almost done and we want to keep your meals coming without a gap. Renewing now means no break in your routine.\nType YES to continue.',
+    'Hello {name}\n\nYou are on a strong run with your healthy eating, and that is the hard part. Renewing before your plan ends keeps the streak going.\nType YES to lock in your next cycle.',
+    'Hi {name}\n\nOnly a few deliveries left on your plan. Renew now and you avoid having to pause and restart later.\nType YES and we will extend it.',
+    'Hello {name}\n\nYour subscription is wrapping up soon. One message from you and your meals continue automatically, no thinking required.\nType YES to keep going.',
+    'Hi {name}\n\nYou have stuck with your health goals this far, which most people never manage. How has the experience been for you?\nType YES to renew, or tell us what to improve.',
+    'Hello {name}\n\nYour plan ends shortly. Members who renew on time get the smoothest, uninterrupted delivery schedule.\nType YES to continue your plan.'
   ]
 };
 function buildWAMsg(m){
