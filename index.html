@@ -410,11 +410,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
         <div class="panel-body" id="tplBody" style="display:none;font-size:12px;line-height:1.7;color:var(--gray-600);padding:10px 0 0">
           <strong>Auto-selected templates (random each time):</strong>
           <br><br>
-          <strong style="color:var(--red)">When Remaining = 0 — win-back (6 templates):</strong>
+          <strong style="color:var(--red)">When Remaining = 0 — just ended this week (6 templates):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--red);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
 
-You built a healthy routine with NOSH7, and it would be a shame to lose that momentum now. You can pick up right where you left off, whenever you are ready.
-Type YES and we will set it up.</div>
+Your plan just finished and your healthy routine is still fresh. Renew now and there is no gap before your next meal arrives.
+Type YES to continue.</div>
           <div style="margin:6px 0;color:var(--gray-400);text-align:center">... + 5 more variations ...</div>
           <strong style="color:var(--orange);margin-top:12px;display:block">When Remaining &gt; 0 — renewal nudge (6 templates):</strong>
           <div style="margin:8px 0 8px 0;background:var(--gray-50);padding:8px;border-radius:6px;border-left:3px solid var(--orange);white-space:pre-wrap;font-family:monospace;font-size:11px">Hi {name}
@@ -1211,15 +1211,16 @@ document.getElementById('statusModal').addEventListener('click',function(e){if(e
 // TEMPLATE — auto random selection
 // ═══════════════════════════════════════════
 const WA_TEMPLATES={
-  // ZERO units — lapsed / win-back. Psychology: loss aversion, identity,
-  // autonomy (no pressure), fresh-start, social proof. Confident, not needy.
+  // ZERO units — JUST ended (last delivery within the past week), NOT old
+  // lapsed members. Tone: timely continuity, momentum still fresh, no gap.
+  // Psychology: loss aversion, commitment, autonomy, social proof.
   zero:[
-    'Hi {name}\n\nYou built a healthy routine with NOSH7, and it would be a shame to lose that momentum now. You can pick up right where you left off, whenever you are ready.\nType YES and we will set it up.',
-    'Hello {name}\n\nEating well was clearly a priority for you, and that goal has not changed. Many members come back sharper after a short break.\nType YES to start your next round.',
-    'Hi {name}\n\nYour plan is paused, but your goals are not. We have improved a few things since you last ordered that we think you will notice.\nType YES to see your options.',
-    'Hello {name}\n\nNo pressure at all. Whenever you want your healthy meals back, it takes one message and we handle the rest.\nType YES and you are sorted.',
-    'Hi {name}\n\nMost members who pause come back within a few weeks, because cooking healthy every day gets tiring fast. We have kept your details ready for a quick restart.\nType YES to continue.',
-    'Hello {name}\n\nQuick one. Before you continue, was there anything about the meals or service you would change? Your honest answer genuinely helps us serve you better.\nType YES to renew, or just reply with your thoughts.'
+    'Hi {name}\n\nYour plan just finished and your healthy routine is still fresh. Renew now and there is no gap before your next meal arrives.\nType YES to continue.',
+    'Hello {name}\n\nYou had your last delivery only a few days ago. The easiest time to keep going is right now, before the routine breaks.\nType YES and we will restart it.',
+    'Hi {name}\n\nYour subscription has just ended. You have already done the hard part by building the habit, so let us keep it going without a pause.\nType YES to renew.',
+    'Hello {name}\n\nNo gap needed. Your plan wrapped up this week, and a quick renewal keeps your meals coming on the same routine.\nType YES and you are sorted.',
+    'Hi {name}\n\nYour deliveries have just run out. Renewing now carries your momentum straight into the next cycle instead of starting over later.\nType YES to keep going.',
+    'Hello {name}\n\nQuick one. Your plan just ended. Before you renew, is there anything you would want changed about the meals or the service?\nType YES to continue, or reply with your thoughts.'
   ],
   // ACTIVE >0 — ending soon. Psychology: continuity, avoid-the-gap,
   // commitment/streak, effort saved, on-time benefit.
